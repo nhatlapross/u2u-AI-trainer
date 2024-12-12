@@ -2,41 +2,22 @@
 import React, { useEffect, useState } from 'react';
 import { Wallet, Menu, X } from 'lucide-react';
 import { Dumbbell } from 'lucide-react';
-import { BrowserWallet, Transaction } from '@martifylabs/mesh';
-import { useWallet, useAddress } from '@martifylabs/mesh-react';
-import CardanoWalletList from '@/components/WalletModal/CardanoWalletList';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import { useWeb3Modal } from '@web3modal/wagmi/react'
+import { useAccount, useDisconnect } from 'wagmi';
 
 const CardanoNavbar = () => {
   //const [isWalletConnected, setIsWalletConnected] = useState(false);
   const router = useRouter();
+  const { open } = useWeb3Modal();
+  const { disconnect } = useDisconnect();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { connected, disconnect } = useWallet();
-  const address = useAddress();
-
-  const disconnectWallet = () => {
-    // setIsWalletConnected(false);
-    // setWalletAddress('');
-    localStorage.removeItem('walletConnected');
-    disconnect();
-  };
+  const { address, isConnected } = useAccount();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const sendLace = async () => {
-    const wallet = await BrowserWallet.enable('Nami');
-    const tx = new Transaction({ initiator: wallet })
-      .sendLovelace(
-        "addr_test1qpkaf3r2xt85j7h3hvx4xtmltcuaegzjyz05ve3czyrtr9g0xlr37m45stpvqn03yfezxfgzrezntprt4u8t2jld4t7shz7cpa",
-        "10000000"
-      )
-
-    const unsignedTx = await tx.build();
-    const signedTx = await wallet.signTx(unsignedTx);
-    const txHash = await wallet.submitTx(signedTx);
-  }
 
   return (
     <nav className="relative flex justify-between items-center p-4 bg-gray-800 text-white">
@@ -67,26 +48,26 @@ const CardanoNavbar = () => {
       </div>
 
       <div className="hidden md:flex items-center space-x-4">
-        {connected ? (
+        {isConnected ? (
           <div className="flex items-center space-x-2">
             <Wallet className="w-5 h-5" />
             <span className="text-sm">{`${address?.slice(0, 6)}...${address?.slice(-4)}`}</span>
             <button
-              onClick={disconnectWallet}
+              onClick={disconnect}
               className="bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-sm"
             >
               Disconnect
             </button>
           </div>
         ) : (
-          <CardanoWalletList />
-          // <button
-          //   onClick={connectWallet}
-          //   className="bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded flex items-center space-x-2 text-sm"
-          // >
-          //   <Wallet className="w-4 h-4" />
-          //   <span>Connect Wallet</span>
-          // </button>
+          // <CardanoWalletList />
+          <button
+            onClick={() => open()}
+            className="bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded flex items-center space-x-2 text-sm"
+          >
+            <Wallet className="w-4 h-4" />
+            <span>Connect Wallet</span>
+          </button>
         )}
       </div>
 
@@ -98,21 +79,28 @@ const CardanoNavbar = () => {
             <a className="hover:text-gray-300" onClick={() => router.push('/hackathon')}>Hackathon</a>
             <a className="hover:text-gray-300" onClick={() => router.push('/profile')}>Profile</a>
             <a className="hover:text-gray-300" onClick={() => router.push('/marketplace')}>Market</a>
-            {connected ? (
+            {isConnected ? (
               <div className="flex flex-col items-center space-y-2">
                 <div className="flex items-center space-x-2">
                   <Wallet className="w-5 h-5" />
                   <span>{`${address?.slice(0, 6)}...${address?.slice(-4)}`}</span>
                 </div>
                 <button
-                  onClick={disconnectWallet}
+                  onClick={disconnect}
                   className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm"
                 >
                   Disconnect
                 </button>
               </div>
             ) : (
-              <CardanoWalletList />
+              // <CardanoWalletList />
+              <button
+              onClick={connectWallet}
+              className="bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded flex items-center space-x-2 text-sm"
+            >
+              <Wallet className="w-4 h-4" />
+              <span>Connect Wallet</span>
+            </button>
             )}
           </div>
         </div>

@@ -1,13 +1,14 @@
 import Layout from '../components/Layout/layout';
 import 'tailwindcss/tailwind.css';
-import { MeshProvider } from '@martifylabs/mesh-react';
+import { config } from '@/config'
+import Web3ModalProvider from '@/context'
 
 export default function MyApp({ Component, pageProps }) {
   return (
-    <MeshProvider>
+    <Web3ModalProvider>
       <Layout>
         <Component {...pageProps} />
       </Layout>
-    </MeshProvider>
+    </Web3ModalProvider>
   )
 }
