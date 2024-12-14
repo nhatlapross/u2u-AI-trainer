@@ -23,18 +23,18 @@ export default function MintNFTPage() {
 
   // Array of avatar image paths
   const avatarImages = [
-    '/avatar/bear1.png',
-    '/avatar/bear2.png',
-    '/avatar/buffalo1.png',
-    '/avatar/buffalo2.png',
-    '/avatar/cat1.png',
-    '/avatar/cat2.png',
-    '/avatar/chicken1.png',
-    '/avatar/chicken2.png',
-    '/avatar/pig1.png',
-    '/avatar/pig2.png',
-    '/avatar/tiger1.png',
-    '/avatar/tiger2.png',
+    {url:'/avatar/bear1.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmcxerZCr21F1zN97NifdYfJjpNay8vpf17wkt9E2a3Ngo"},
+    {url:'/avatar/bear2.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmNWTAK5M3GRx8R94NXsJA1n15GzkcrbmUA3t3gJyotNAw"},
+    {url:'/avatar/buffalo1.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmPfxSoDiwQX3Kb6UyEahKdP3UnyqHB6bcgrDJrY61v67X"},
+    {url:'/avatar/buffalo2.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmZ7C2jnE5T2WBRejhPExgitfwbQFpyVLo2zcXfamVpnbF"},
+    {url:'/avatar/cat1.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmZiV2bBF5fkvSfuS7PQi17MYqgquW4JXHgJp8XkvH59G8"},
+    {url:'/avatar/cat2.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmRfDWaT8DmrrP2Vu4AQZfG88tdnS9VZ9vcusCUU4H68qc"},
+    {url:'/avatar/chicken1.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmYPZtv8KwiXu41oiXb7j6pi4mh8j95v7pb7rwLuNQPD2P"},
+    {url:'/avatar/chicken2.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmPUZfbL7XUZwooC1BtfLdfmnbbShiBS1dASC4duzc5Y6E"},
+    {url:'/avatar/pig1.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmNdouP39erhzRaEwy3qQf6yH6P8qQdezuZkdg2JLQjoyz"},
+    {url:'/avatar/pig2.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmQybyAYpUHVjzTzAXJoJUm7MW7BdreDUims9Kmih2G4Lm"},
+    {url:'/avatar/tiger1.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmbnW2fdYPSiRAGSNu8JBUCJHjmy5rxSALmFEVQMwNSAWU"},
+    {url:'/avatar/tiger2.png',link:"https://statutory-plum-seahorse.myfilebase.com/ipfs/QmcW93pTwXTRwjnnGF62ybNZuZnkFvpDLy1A9PPkZBcJ8p"},
   ]
 
   const handleMint = async (e) => {
