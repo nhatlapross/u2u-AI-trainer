@@ -228,6 +228,31 @@
 			},
 			{
 				"indexed": false,
+				"internalType": "uint256",
+				"name": "newLevel",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newPoints",
+				"type": "uint256"
+			}
+		],
+		"name": "MissionCompleted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
 				"internalType": "address",
 				"name": "owner",
 				"type": "address"
@@ -242,12 +267,6 @@
 				"indexed": false,
 				"internalType": "string",
 				"name": "rarity",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "description",
 				"type": "string"
 			},
 			{
@@ -277,6 +296,25 @@
 			}
 		],
 		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "redeemedPoints",
+				"type": "uint256"
+			}
+		],
+		"name": "PointsRedeemed",
 		"type": "event"
 	},
 	{
@@ -345,6 +383,24 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_currentDay",
+				"type": "uint256"
+			}
+		],
+		"name": "completeMission",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "tokenId",
 				"type": "uint256"
 			}
@@ -397,11 +453,6 @@
 			},
 			{
 				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
 				"name": "metadataURI",
 				"type": "string"
 			}
@@ -448,11 +499,6 @@
 			{
 				"internalType": "string",
 				"name": "_rarity",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_description",
 				"type": "string"
 			},
 			{
@@ -519,11 +565,6 @@
 				"internalType": "string",
 				"name": "rarity",
 				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -559,6 +600,24 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_redeemPoints",
+				"type": "uint256"
+			}
+		],
+		"name": "redeemPoints",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -720,6 +779,24 @@
 			}
 		],
 		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_newTokenURI",
+				"type": "string"
+			}
+		],
+		"name": "updateTokenURI",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
