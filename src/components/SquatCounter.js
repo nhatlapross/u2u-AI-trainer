@@ -443,14 +443,13 @@ const AdvancedSquatCounter = () => {
 
   useEffect(() => {
     const checkMission = async () => {
-      if (correctSquats > 10) {
-        window.alert("Your mission success!");
-        if(hash != null) {
-          router.push('/mission');
-        }
-      }
-      if (correctSquats + incorrectSquats === 1) {
+      if (correctSquats == 10) {
         setShowRewardModal(true);
+        window.alert("Your mission success!");
+      }
+      if (correctSquats + incorrectSquats === 50) {
+        window.alert("Your mission fail!");
+        router.push('/mission');
       }
     }
     checkMission();
