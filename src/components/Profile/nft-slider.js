@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { 
@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useWriteContract } from 'wagmi'
+import { abi } from '@/abi/abi'
 
 const initialNFTs = [
   { 
@@ -85,7 +87,8 @@ const initialNFTs = [
 export default function NFTSlider({ onNFTUse }) {
   const [nfts, setNFTs] = useState(initialNFTs)
   const [selectedNFT, setSelectedNFT] = useState(null)
-
+    const { data: hash, writeContract } = useWriteContract();
+const [isMinting, setIsMinting] = useState(false);
   const handleNFTClick = (nft) => {
     // Only allow clicking on NFTs that are not selling
     if (!nft.isSelling) {
@@ -139,6 +142,22 @@ export default function NFTSlider({ onNFTUse }) {
 
   }
 
+  const redeemPoint = async () => {
+      setIsMinting(true);
+      try {
+        await writeContract({
+          abi: abi,
+          address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+          functionName: 'redeemPoints',
+          args: [2, selectedNFT.points],
+        });
+      } catch (error) {
+        setIsMinting(false)
+        alert('Redeem failed:', error);
+        
+      }
+    }
+
   const handleCancelSell = (nftId) => {
     const updatedNFTs = nfts.map(nft => 
       nft.id === nftId 
@@ -148,6 +167,13 @@ export default function NFTSlider({ onNFTUse }) {
     
     setNFTs(updatedNFTs)
   }
+
+  useEffect(()=>{
+    if(hash != null) {
+      setIsMinting(false);
+    }
+  },[hash])
+  
 
   return (
     <>
@@ -248,10 +274,11 @@ export default function NFTSlider({ onNFTUse }) {
                 </Button>
                 <Button 
                   variant="destructive" 
-                  onClick={CheckOnchain}
-                  className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+                  onClick={redeemPoint}
+                  disabled={isMinting}
+                  className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Check on-chain
+                  {isMinting ?'Redeeming...':'Redeem'}
                 </Button>
               </div>
             </div>
