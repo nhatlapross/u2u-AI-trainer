@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CheckCircle, Maximize2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAccount, useWriteContract } from 'wagmi'
+import { abi } from '@/abi/abi'
+
 // Safely check for browser environment
 const isBrowser = typeof window !== 'undefined';
 
@@ -28,7 +31,10 @@ const AdvancedSquatCounter = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [successAnimation, setSuccessAnimation] = useState(false);
   const videoContainerRef = useRef(null);
+  const [showRewardModal, setShowRewardModal] = useState(false);
+  const [isMinting, setIsMinting] = useState(false);
   const router = useRouter();
+  const { data: hash, writeContract } = useWriteContract();
 
   // State tracking
   const stateRef = useRef({
@@ -217,7 +223,7 @@ const AdvancedSquatCounter = () => {
 
   const toggleFullScreen = () => {
     const container = videoContainerRef.current;
-    
+
     if (!isFullScreen) {
       if (container.requestFullscreen) {
         container.requestFullscreen();
@@ -408,22 +414,46 @@ const AdvancedSquatCounter = () => {
     }
   };
 
-  const getReady = () => {
-    setIsLoading(!isLoading);
-    setCorrectSquats(0);
-    setIncorrectSquats(0);
+  const completeMission = async () => {
+    setIsMinting(true);
+    try {
+      await writeContract({
+        abi: abi,
+        address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+        functionName: 'completeMission',
+        args: [2, 3],
+      });
+    } catch (error) {
+      console.error('Minting failed:', error);
+      
+    }
   }
 
-  useEffect(() => {
-    if (correctSquats > 10) {
-      window.alert("Your mission success!");
-      router.push('/mission');
+  useEffect(()=>{
+    if(hash != null) {
+        setIsMinting(false);
+        setTimeout(() => {
+          setShowRewardModal(false);
+          router.push('/mission');
+      }, 1000);
     }
-    if (correctSquats + incorrectSquats == 50) {
-      window.alert("Your mission failed!");
-      router.push('/mission');
-    }
+  },[hash])
 
+  
+
+  useEffect(() => {
+    const checkMission = async () => {
+      if (correctSquats > 10) {
+        window.alert("Your mission success!");
+        if(hash != null) {
+          router.push('/mission');
+        }
+      }
+      if (correctSquats + incorrectSquats === 1) {
+        setShowRewardModal(true);
+      }
+    }
+    checkMission();
   }, [correctSquats, incorrectSquats])
 
   useEffect(() => {
@@ -437,6 +467,46 @@ const AdvancedSquatCounter = () => {
     };
   }, []);
 
+
+  // Reward Modal Component
+  const RewardModal = () => {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+        <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full mx-4 text-center">
+          <div className="mb-4">
+            <CheckCircle
+              size={100}
+              className="mx-auto text-green-500 mb-4"
+            />
+            <h2 className="text-2xl font-bold text-white mb-2">Mission Completed!</h2>
+            <p className="text-gray-300 mb-4">
+              You're on your way to fitness success. Claim your reward now!
+            </p>
+          </div>
+
+          <div className="flex flex-col space-y-3">
+            <button
+              onClick={() => {
+                completeMission();
+              }}
+              disabled={isMinting}
+              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isMinting ? 'Claiming...' : 'Claim Reward'}
+            </button>
+
+            {/* <button
+              onClick={() => setShowRewardModal(false)}
+              className="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 transition"
+            >
+              Cancel
+            </button> */}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col items-center gap-4 p-4 bg-gray-900 min-h-screen w-full">
       {successAnimation && (
@@ -447,6 +517,7 @@ const AdvancedSquatCounter = () => {
           />
         </div>
       )}
+      {showRewardModal && <RewardModal />}
       <div className="flex items-center justify-center w-full max-w-[640px] mb-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-white text-center">Squat with AI trainer</h1>
         {/* <button 
@@ -486,7 +557,7 @@ const AdvancedSquatCounter = () => {
         </div>
       )}
 
-{!isLoading && (
+      {!isLoading && (
         <div
           ref={videoContainerRef}
           className={`relative w-full max-w-[640px] aspect-video ${isFullScreen ? 'fullscreen-container' : ''}`}
@@ -513,8 +584,8 @@ const AdvancedSquatCounter = () => {
             </div>
           )}
 
-          <button 
-            onClick={toggleFullScreen} 
+          <button
+            onClick={toggleFullScreen}
             className="absolute top-2 right-2 z-10 bg-white/30 rounded-full p-2 hover:bg-white/50 transition"
           >
             <Maximize2 className="text-white" />

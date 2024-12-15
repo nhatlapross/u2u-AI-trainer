@@ -95,7 +95,7 @@ const CardanoNavbar = () => {
             ) : (
               // <CardanoWalletList />
               <button
-              onClick={connectWallet}
+              onClick={() => open()}
               className="bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded flex items-center space-x-2 text-sm"
             >
               <Wallet className="w-4 h-4" />

@@ -191,6 +191,38 @@ export const abi = [
 			{
 				"indexed": false,
 				"internalType": "uint256",
+				"name": "_fromTokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_toTokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "BatchMetadataUpdate",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "MetadataUpdate",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
 				"name": "tokenId",
 				"type": "uint256"
 			},
@@ -229,6 +261,18 @@ export const abi = [
 				"indexed": false,
 				"internalType": "string",
 				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "rarity",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "tokenURI",
 				"type": "string"
 			}
 		],
@@ -401,6 +445,16 @@ export const abi = [
 				"internalType": "uint256",
 				"name": "points",
 				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "rarity",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "metadataURI",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -441,6 +495,16 @@ export const abi = [
 				"internalType": "address",
 				"name": "_to",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_rarity",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_tokenURI",
+				"type": "string"
 			}
 		],
 		"name": "mintNFT",
@@ -496,6 +560,11 @@ export const abi = [
 				"internalType": "uint256",
 				"name": "points",
 				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "rarity",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -710,6 +779,24 @@ export const abi = [
 			}
 		],
 		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_newTokenURI",
+				"type": "string"
+			}
+		],
+		"name": "updateTokenURI",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
