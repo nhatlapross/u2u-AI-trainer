@@ -18,79 +18,49 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useWriteContract } from 'wagmi'
+import { useAccount, useWriteContract, useReadContract } from 'wagmi'
 import { abi } from '@/abi/abi'
 
-const initialNFTs = [
-  { 
-    id: 1, 
-    name: "Fitness Achievement #1", 
-    image: "/avatar/bear1.png",
-    level: 3,
-    days: 45,
-    points: 1250,
-    isUsing: false,
-    isSelling: false,
-    bonus: {
-      calories: 250,
-      workoutDays: 15,
-      adalevel: 1
-    }
-  },
-  { 
-    id: 2, 
-    name: "Cardano Summit Badge", 
-    image: "/avatar/cat1.png",
-    level: 2,
-    days: 30,
-    points: 875,
-    isUsing: false,
-    isSelling: false,
-    bonus: {
-      calories: 150,
-      workoutDays: 10,
-      adalevel: 2
-    }
-  },
-  { 
-    id: 3, 
-    name: "Workout Milestone", 
-    image: "/avatar/chicken1.png",
-    level: 4,
-    days: 60,
-    points: 1750,
-    isUsing: false,
-    isSelling: false,
-    bonus: {
-      calories: 350,
-      workoutDays: 20,
-      adalevel: 3
-    }
-  },
-  { 
-    id: 4, 
-    name: "Virtual Gym Pass", 
-    image: "/avatar/pig1.png",
-    level: 1,
-    days: 15,
-    points: 450,
-    isUsing: false,
-    isSelling: false,
-    bonus: {
-      calories: 100,
-      workoutDays: 5,
-      adalevel: 1
-    }
-  },
-]
-
 export default function NFTSlider({ onNFTUse }) {
-  const [nfts, setNFTs] = useState(initialNFTs)
+  // State to hold NFTs with default empty array
+  const [nfts, setNFTs] = useState([])
   const [selectedNFT, setSelectedNFT] = useState(null)
-    const { data: hash, writeContract } = useWriteContract();
-const [isMinting, setIsMinting] = useState(false);
+  
+  const { data: hash, writeContract } = useWriteContract()
+  const { address } = useAccount()
+  const [isMinting, setIsMinting] = useState(false)
+
+  // Fetch NFTs using useReadContract
+  const { data: nftDetails, isLoading, error } = useReadContract({
+    abi: abi,
+    address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+    functionName: 'getNFTDetailsByAddress',
+    args: [address],
+    query: {
+      enabled: !!address
+    }
+  })
+
+  // Transform contract NFT data to component's NFT interface
+  useEffect(() => {
+    if (nftDetails && Array.isArray(nftDetails)) {
+      const transformedNFTs = nftDetails.map((nft) => ({
+        tokenId: nft.tokenId,
+        lastUpdateDay: nft.lastUpdateDay,
+        level: nft.level,
+        name: nft.name,
+        points: nft.points,
+        rarity: nft.rarity,
+        tokenUri: nft.tokenUri,
+        isUsing: false,
+        isSelling: false
+      }))
+      
+      setNFTs(transformedNFTs)
+    }
+  }, [nftDetails])
+
   const handleNFTClick = (nft) => {
-    // Only allow clicking on NFTs that are not selling
     if (!nft.isSelling) {
       setSelectedNFT(nft)
     }
@@ -101,86 +71,40 @@ const [isMinting, setIsMinting] = useState(false);
   }
 
   const handleUseNFT = () => {
+    if (!selectedNFT) return
+
     const updatedNFTs = nfts.map(nft => {
-      if (nft.id === selectedNFT.id) {
-        // Toggle use status
-        const newIsUsing = !nft.isUsing
+      if (nft.tokenId === selectedNFT.tokenId) {
         return { 
           ...nft, 
-          isUsing: newIsUsing,
-          isSelling: false // Cancel selling when using
+          isUsing: !nft.isUsing,
+          isSelling: false
         }
       }
       return { 
         ...nft, 
-        isUsing: false, // Unuse other NFTs
-        isSelling: false // Ensure other NFTs are not in selling mode
+        isUsing: false,
+        isSelling: false
       }
     })
     
-    // Find the used NFT to pass bonus information
-    const usedNFT = updatedNFTs.find(nft => nft.id === selectedNFT.id && nft.isUsing)
+    const usedNFT = updatedNFTs.find(nft => nft.tokenId === selectedNFT.tokenId && nft.isUsing)
     
     setNFTs(updatedNFTs)
-    // Call the callback to update parent component
-    onNFTUse && onNFTUse(usedNFT ? usedNFT : null)
+    onNFTUse && onNFTUse(usedNFT || null)
     handleCloseModal()
   }
 
-  const handleSellNFT = () => {
-    const updatedNFTs = nfts.map(nft => 
-      nft.id === selectedNFT.id 
-        ? { ...nft, isSelling: true, isUsing: false } 
-        : { ...nft, isSelling: false, isUsing: false }
-    )
-    
-    setNFTs(updatedNFTs)
-    handleCloseModal()
-  }
-
-  const CheckOnchain = () => {
-
-  }
-
-  const redeemPoint = async () => {
-      setIsMinting(true);
-      try {
-        await writeContract({
-          abi: abi,
-          address: process.env.NEXT_PUBLIC_WEFIT_NFT,
-          functionName: 'redeemPoints',
-          args: [2, selectedNFT.points],
-        });
-      } catch (error) {
-        setIsMinting(false)
-        alert('Redeem failed:', error);
-        
-      }
-    }
-
-  const handleCancelSell = (nftId) => {
-    const updatedNFTs = nfts.map(nft => 
-      nft.id === nftId 
-        ? { ...nft, isSelling: false } 
-        : nft
-    )
-    
-    setNFTs(updatedNFTs)
-  }
-
-  useEffect(()=>{
-    if(hash != null) {
-      setIsMinting(false);
-    }
-  },[hash])
-  
+  // Render loading or error states
+  if (isLoading) return <div>Loading NFTs...</div>
+  if (error) return <div>Error loading NFTs: {error.message}</div>
 
   return (
     <>
       <Carousel className="w-full max-w-xs mx-auto">
         <CarouselContent>
           {nfts.map((nft) => (
-            <CarouselItem key={nft.id}>
+            <CarouselItem key={nft.tokenId}>
               <Card>
                 <CardContent 
                   className={`
@@ -195,7 +119,7 @@ const [isMinting, setIsMinting] = useState(false);
                   <div className="text-center">
                     <div className="relative">
                       <Image
-                        src={nft.image}
+                        src={nft.tokenUri}
                         alt={nft.name}
                         width={150}
                         height={150}
@@ -226,7 +150,7 @@ const [isMinting, setIsMinting] = useState(false);
                         className="mt-2"
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleCancelSell(nft.id)
+                          // Implement cancel sell logic
                         }}
                       >
                         Cancel Sell
@@ -252,16 +176,18 @@ const [isMinting, setIsMinting] = useState(false);
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Image
-                  src={selectedNFT.image}
+                  src={selectedNFT.tokenUri}
                   alt={selectedNFT.name}
                   width={100}
                   height={100}
                   className="col-span-2 mx-auto rounded-lg"
                 />
                 <div className="col-span-2 space-y-2">
-                  <p><strong>Level:</strong> {selectedNFT.level}</p>
-                  <p><strong>Days:</strong> {selectedNFT.days}</p>
-                  <p><strong>Points:</strong> {selectedNFT.points}</p>
+                  <p><strong>Token ID:</strong> {selectedNFT.tokenId.toString()}</p>
+                  <p><strong>Level:</strong> {selectedNFT.level.toString()}</p>
+                  <p><strong>Last Update:</strong> {selectedNFT.lastUpdateDay.toString()}</p>
+                  <p><strong>Points:</strong> {selectedNFT.points.toString()}</p>
+                  <p><strong>Rarity:</strong> {selectedNFT.rarity}</p>
                 </div>
               </div>
               <div className="flex justify-between space-x-2">
@@ -274,11 +200,10 @@ const [isMinting, setIsMinting] = useState(false);
                 </Button>
                 <Button 
                   variant="destructive" 
-                  onClick={redeemPoint}
-                  disabled={isMinting}
-                  className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => {/* Implement redeem logic */}}
+                  className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
                 >
-                  {isMinting ?'Redeeming...':'Redeem'}
+                  Redeem
                 </Button>
               </div>
             </div>

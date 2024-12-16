@@ -50,15 +50,16 @@ export default function ProfilePage() {
     currentNFT: null
   })
 
-  const handleNFTUse = (data) => {
-    console.log(data);
-    if (data) {
+  const handleNFTUse = (nft) => {
+    console.log("Selected NFT:", nft);
+    if (nft) {
       setUserStats(prevStats => ({
-        level: data.level,
-        caloriesBurned: data?.bonus?.calories,
-        workoutDays: data.days,
-        adalevel: data?.bonus.adalevel,
-        currentNFT: data?.bonus.adalevel
+        ...prevStats,
+        level: nft.level.toString() || 10,
+        caloriesBurned: nft.points || 1567,
+        workoutDays: parseInt(nft.lastUpdateDay) || 68,
+        adalevel: nft.tokenId || 1,
+        currentNFT: nft.tokenId
       }))
     } else {
       // Reset to base stats when no NFT is used
@@ -74,7 +75,7 @@ export default function ProfilePage() {
 
   // Determine current profile based on used NFT
   const currentProfile = userStats.currentNFT 
-    ? nftProfiles[userStats.currentNFT] 
+    ? nftProfiles[userStats.currentNFT] || nftProfiles.default
     : nftProfiles.default
 
   return (
@@ -137,8 +138,6 @@ export default function ProfilePage() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              {/* <CardanoIcon />
-              <span>ADA</span> */}
               <KaiaIcon />
               <span>KAIA</span>
             </div>

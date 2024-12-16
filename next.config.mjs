@@ -23,6 +23,17 @@ const nextConfig = {
         },
       ];
     },
+    images: {
+      domains: ['statutory-plum-seahorse.myfilebase.com'],
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'statutory-plum-seahorse.myfilebase.com',
+          port: '',
+          pathname: '/ipfs/**',
+        }
+      ]
+    }
 };
 
 export default nextConfig;

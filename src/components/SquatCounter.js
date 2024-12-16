@@ -416,16 +416,19 @@ const AdvancedSquatCounter = () => {
 
   const completeMission = async () => {
     setIsMinting(true);
+    console.log(getCurrentDate());
+    let currentDate = getCurrentDate();
     try {
       await writeContract({
         abi: abi,
         address: process.env.NEXT_PUBLIC_WEFIT_NFT,
         functionName: 'completeMission',
-        args: [2, 3],
+        args: [3, currentDate],
       });
     } catch (error) {
       console.error('Minting failed:', error);
-      
+      alert('Claim failed!');
+      router.push('/mission');
     }
   }
 
@@ -441,11 +444,19 @@ const AdvancedSquatCounter = () => {
 
   
 
+  const getCurrentDate = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+};
+
   useEffect(() => {
     const checkMission = async () => {
-      if (correctSquats == 10) {
+      if (correctSquats + incorrectSquats == 1) {
         setShowRewardModal(true);
-        window.alert("Your mission success!");
+        // window.alert("Your mission success!");
       }
       if (correctSquats + incorrectSquats === 50) {
         window.alert("Your mission fail!");
