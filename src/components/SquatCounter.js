@@ -477,7 +477,7 @@ const AdvancedSquatCounter = () => {
 
   useEffect(() => {
     const checkMission = async () => {
-      if (correctSquats + incorrectSquats == 1) {
+      if (correctSquats == 5) {
         setShowRewardModal(true);
         // window.alert("Your mission success!");
       }

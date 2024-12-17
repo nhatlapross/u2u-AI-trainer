@@ -29,7 +29,7 @@ const CardanoNavbar = () => {
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2" onClick={() => router.push('/')}>
           <Dumbbell className="w-8 h-8 text-blue-500" />
-          <h2 className="text-2xl font-bold">Funfit</h2>
+          <h2 className="text-2xl font-bold">Wefit365</h2>
         </div>
 
         {/* Desktop Navigation */}

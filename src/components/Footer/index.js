@@ -18,7 +18,7 @@ const AIFitnessFooter = () => {
         <div className="flex flex-col items-start space-y-4">
           <div className="flex items-center space-x-2">
             <Dumbbell className="w-8 h-8 text-blue-500" />
-            <h2 className="text-2xl font-bold">Funfit AI trainer</h2>
+            <h2 className="text-2xl font-bold">Wefit365 AI trainer</h2>
           </div>
           <p className="text-gray-300">
             Revolutionizing fitness with AI-powered personalized training and real-time form analysis.
