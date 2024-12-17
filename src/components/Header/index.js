@@ -18,6 +18,11 @@ const CardanoNavbar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const disconectWallet = () => { 
+    localStorage.setItem("userNFT",'');
+    localStorage.setItem("dayNFT",'');
+    disconnect();
+  }
 
   return (
     <nav className="relative flex justify-between items-center p-4 bg-gray-800 text-white">
@@ -53,7 +58,7 @@ const CardanoNavbar = () => {
             <Wallet className="w-5 h-5" />
             <span className="text-sm">{`${address?.slice(0, 6)}...${address?.slice(-4)}`}</span>
             <button
-              onClick={disconnect}
+              onClick={disconectWallet}
               className="bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-sm"
             >
               Disconnect

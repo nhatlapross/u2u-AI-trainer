@@ -35,6 +35,8 @@ const AdvancedSquatCounter = () => {
   const [isMinting, setIsMinting] = useState(false);
   const router = useRouter();
   const { data: hash, writeContract } = useWriteContract();
+  const [userNFT, setUserNFT] = useState(null);
+  const [dayNFT, setDayNFT] = useState(null);
 
   // State tracking
   const stateRef = useRef({
@@ -62,7 +64,27 @@ const AdvancedSquatCounter = () => {
     setTimeout(() => setSuccessAnimation(false), 1500);
   };
 
+  const { address } = useAccount()
+
+  useEffect(()=>{
+    const nft = localStorage.getItem("userNFT");
+    if(nft != null && nft != '') {
+      setTimeout(() => {
+        setUserNFT(nft.toString());
+      }, 100);
+
+    }
+    const day = localStorage.getItem("dayNFT");
+    if(day!= null && day != '') {
+      setTimeout(() => {
+        setDayNFT(day.toString());
+      }, 100);
+    }
+  },[address]);
+
   useEffect(() => {
+    
+
     const handleResize = () => {
       // Change the aspect ratio multiplier from 0.75 to a larger value, like 0.9
       const width = isBrowser
@@ -423,11 +445,12 @@ const AdvancedSquatCounter = () => {
         abi: abi,
         address: process.env.NEXT_PUBLIC_WEFIT_NFT,
         functionName: 'completeMission',
-        args: [3, currentDate],
+        args: [userNFT, parseInt(dayNFT)+1],
       });
     } catch (error) {
       console.error('Minting failed:', error);
       alert('Claim failed!');
+      localStorage.setItem("dayNFT",(parseInt(dayNFT)+1).toString());
       router.push('/mission');
     }
   }
@@ -530,6 +553,7 @@ const AdvancedSquatCounter = () => {
       {showRewardModal && <RewardModal />}
       <div className="flex items-center justify-center w-full max-w-[640px] mb-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-white text-center">Squat with AI trainer</h1>
+
         {/* <button 
           onClick={toggleFullScreen} 
           className="text-white bg-blue-500 p-2 rounded-lg hover:bg-blue-600"
@@ -537,6 +561,7 @@ const AdvancedSquatCounter = () => {
           {isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
         </button> */}
       </div>
+      {(userNFT == null || userNFT == '') && <h3 className="text-2xl sm:text-3xl font-bold text-red-500 text-center">Select NFT in profile to claim reward after exercise</h3>}
       <div className="w-full max-w-[640px] px-4">
         <button
           className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"

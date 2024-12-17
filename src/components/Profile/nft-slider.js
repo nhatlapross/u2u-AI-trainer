@@ -26,12 +26,22 @@ export default function NFTSlider({ onNFTUse }) {
   const [nfts, setNFTs] = useState([])
   const [selectedNFT, setSelectedNFT] = useState(null)
   
-  const { data: hash, writeContract } = useWriteContract()
   const { address } = useAccount()
-  const [isMinting, setIsMinting] = useState(false)
+  const { 
+    data: hash, 
+    writeContract, 
+    isSuccess: isRedeemSuccess, 
+    error: redeemError 
+  } = useWriteContract();
+  const [isMinting, setIsMinting] = useState(false);
 
   // Fetch NFTs using useReadContract
-  const { data: nftDetails, isLoading, error } = useReadContract({
+  const { 
+    data: nftDetails, 
+    isLoading, 
+    error, 
+    refetch: refetchNFTDetails 
+  } = useReadContract({
     abi: abi,
     address: process.env.NEXT_PUBLIC_WEFIT_NFT,
     functionName: 'getNFTDetailsByAddress',
@@ -70,6 +80,34 @@ export default function NFTSlider({ onNFTUse }) {
     setSelectedNFT(null)
   }
 
+  const redeemPoint = async () => {
+    setIsMinting(true);
+    try {
+      await writeContract({
+        abi: abi,
+        address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+        functionName: 'redeemPoints',
+        args: [selectedNFT.tokenId, selectedNFT.points],
+      });
+    } catch (error) {
+      setIsMinting(false)
+      alert("Unable to redeem points");
+    }
+  }
+
+  useEffect(() => {
+    if (isRedeemSuccess) {
+      // Reload NFT details
+      refetchNFTDetails()
+
+      // Reset minting state
+      setIsMinting(false)
+      
+      // Close modal
+      handleCloseModal()
+    }
+  }, [isRedeemSuccess])
+
   const handleUseNFT = () => {
     if (!selectedNFT) return
 
@@ -94,6 +132,12 @@ export default function NFTSlider({ onNFTUse }) {
     onNFTUse && onNFTUse(usedNFT || null)
     handleCloseModal()
   }
+
+  useEffect(()=>{
+    if(hash != null){
+      alert("redeem success!");
+    }
+  },[hash])
 
   // Render loading or error states
   if (isLoading) return <div>Loading NFTs...</div>
@@ -200,10 +244,11 @@ export default function NFTSlider({ onNFTUse }) {
                 </Button>
                 <Button 
                   variant="destructive" 
-                  onClick={() => {/* Implement redeem logic */}}
+                  onClick={() => redeemPoint()}
+                  disabled={isMinting}
                   className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
                 >
-                  Redeem
+                  {isMinting ? "Redeeming..." : "Redeem"}
                 </Button>
               </div>
             </div>
