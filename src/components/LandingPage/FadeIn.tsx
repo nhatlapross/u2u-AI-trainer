@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-export function FadeIn({ children, delay = 0 }) {
+export function FadeIn({ children, delay = 0 }: { children: any; delay?: number }) {
   const ref = useRef(null)
 
   useEffect(() => {

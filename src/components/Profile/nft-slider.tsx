@@ -21,10 +21,15 @@ import { Badge } from "@/components/ui/badge"
 import { useAccount, useWriteContract, useReadContract } from 'wagmi'
 import { abi } from '@/abi/abi'
 
-export default function NFTSlider({ onNFTUse }) {
+interface NFTSliderProps {
+  onNFTUse: (nft: any) => void;
+  nftDetails?: any;
+}
+
+export default function NFTSlider({ onNFTUse, nftDetails }: NFTSliderProps) {
   // State to hold NFTs with default empty array
-  const [nfts, setNFTs] = useState([])
-  const [selectedNFT, setSelectedNFT] = useState(null)
+  const [nfts, setNFTs] = useState<any[]>([])
+  const [selectedNFT, setSelectedNFT] = useState<any>(null)
   
   const { address } = useAccount()
   const { 
@@ -37,13 +42,13 @@ export default function NFTSlider({ onNFTUse }) {
 
   // Fetch NFTs using useReadContract
   const { 
-    data: nftDetails, 
+    data: contractNftDetails, 
     isLoading, 
     error, 
     refetch: refetchNFTDetails 
   } = useReadContract({
     abi: abi,
-    address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+    address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
     functionName: 'getNFTDetailsByAddress',
     args: [address],
     query: {
@@ -51,10 +56,13 @@ export default function NFTSlider({ onNFTUse }) {
     }
   })
 
+  // Use prop data if available, otherwise use contract data
+  const activeNftDetails = nftDetails || contractNftDetails
+
   // Transform contract NFT data to component's NFT interface
   useEffect(() => {
-    if (nftDetails && Array.isArray(nftDetails)) {
-      const transformedNFTs = nftDetails.map((nft) => ({
+    if (activeNftDetails && Array.isArray(activeNftDetails)) {
+      const transformedNFTs = activeNftDetails.map((nft: any) => ({
         tokenId: nft.tokenId,
         lastUpdateDay: nft.lastUpdateDay,
         level: nft.level,
@@ -68,9 +76,9 @@ export default function NFTSlider({ onNFTUse }) {
       
       setNFTs(transformedNFTs)
     }
-  }, [nftDetails])
+  }, [activeNftDetails])
 
-  const handleNFTClick = (nft) => {
+  const handleNFTClick = (nft: any) => {
     if (!nft.isSelling) {
       setSelectedNFT(nft)
     }
@@ -85,7 +93,7 @@ export default function NFTSlider({ onNFTUse }) {
     try {
       await writeContract({
         abi: abi,
-        address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+        address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
         functionName: 'redeemPoints',
         args: [selectedNFT.tokenId, selectedNFT.points],
       });

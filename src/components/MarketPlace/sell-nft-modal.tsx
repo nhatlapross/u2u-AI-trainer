@@ -7,10 +7,21 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-export default function SellNFTModal({ isOpen, onClose, onSetPrice, nft }) {
+interface SellNFTModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSetPrice: (price: number) => void;
+  nft: { 
+    image: string; 
+    name: string; 
+    id: string;
+    [key: string]: any;
+  };
+}
+export default function SellNFTModal({ isOpen, onClose, onSetPrice, nft }: SellNFTModalProps) {
   const [price, setPrice] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e:any) => {
     e.preventDefault()
     const numPrice = parseFloat(price)
     if (!isNaN(numPrice) && numPrice > 0) {
@@ -57,4 +68,3 @@ export default function SellNFTModal({ isOpen, onClose, onSetPrice, nft }) {
     </Dialog>
   )
 }
-

@@ -52,8 +52,8 @@ const hackathons = [
     }
 ];
 
-export default function MyHackathon({ myNFTs }) {
-    const handleClaim = (hackathon) => {
+export default function MyHackathon({ myNFTs }: { myNFTs: any[] }) {
+    const handleClaim = (hackathon: any) => {
         // Implement claim logic here
         console.log(`Claiming hackathon: ${hackathon.name}`);
     };

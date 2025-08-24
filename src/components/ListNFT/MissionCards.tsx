@@ -5,9 +5,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+interface Mission {
+  title: string;
+  description: string;
+  image: string;
+  isLocked: boolean;
+  correct: number;
+  maxTurn: number;
+}
+
 export default function MissionCards() {
   const router = useRouter()
-  const [selectedMission, setSelectedMission] = useState(null)
+  const [selectedMission, setSelectedMission] = useState<Mission | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const missions = [
@@ -45,7 +54,7 @@ export default function MissionCards() {
     }
   ]
 
-  const handleMissionClick = (mission) => {
+  const handleMissionClick = (mission: Mission) => {
     if (!mission.isLocked) {
       setSelectedMission(mission)
       setIsModalOpen(true)

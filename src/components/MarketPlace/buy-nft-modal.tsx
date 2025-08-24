@@ -1,7 +1,18 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
-export default function BuyNFTModal({ isOpen, onClose, onBuy, nft }) {
+interface BuyNFTModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onBuy: () => void;
+  nft: {
+    name: string;
+    price: number | null;
+    [key: string]: any;
+  };
+}
+
+export default function BuyNFTModal({ isOpen, onClose, onBuy, nft }: BuyNFTModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gray-800 text-white">

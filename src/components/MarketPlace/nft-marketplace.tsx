@@ -70,24 +70,35 @@ const mockNFTs = [
 ]
 
 
+interface NFT {
+    id: string;
+    name: string;
+    image: string;
+    price: number | null;
+    owner: string;
+    level: number;
+    days: number;
+    points: number;
+}
+
 export default function NFTMarketplace() {
-    const [nfts, setNfts] = useState(mockNFTs)
-    const [selectedNFT, setSelectedNFT] = useState(null)
+    const [nfts, setNfts] = useState<NFT[]>(mockNFTs)
+    const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null)
     const [isSellModalOpen, setIsSellModalOpen] = useState(false)
     const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
     const [activeTab, setActiveTab] = useState('market')
 
-    const handleSellNFT = (nft) => {
+    const handleSellNFT = (nft: NFT) => {
         setSelectedNFT(nft)
         setIsSellModalOpen(true)
     }
 
-    const handleBuyNFT = (nft) => {
+    const handleBuyNFT = (nft: NFT) => {
         setSelectedNFT(nft)
         setIsBuyModalOpen(true)
     }
 
-    const handleSetPrice = (price) => {
+    const handleSetPrice = (price: number) => {
         if (selectedNFT) {
             const updatedNFTs = nfts.map((nft) =>
                 nft.id === selectedNFT.id ? { ...nft, price, owner: '0xMarket' } : nft
@@ -99,7 +110,7 @@ export default function NFTMarketplace() {
 
     const handleBuy = () => {
         if (selectedNFT) {
-            const updatedNFTs = nfts.map((nft) =>
+            const updatedNFTs = nfts.map((nft: NFT) =>
                 nft.id === selectedNFT.id ? { ...nft, price: null, owner: '0x1234...5678' } : nft
             )
             setNfts(updatedNFTs)

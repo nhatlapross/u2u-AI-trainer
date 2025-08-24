@@ -5,9 +5,9 @@ import AllHackathon from './AllHackathon';
 
 const FitnessHackathonSlider = () => {
     const [activeTab, setActiveTab] = useState('market');
-    const [myNFTs, setMyNFTs] = useState([]);
+    const [myNFTs, setMyNFTs] = useState<any[]>([]);
 
-    const handleJoinHackathon = (hackathon) => {
+    const handleJoinHackathon = (hackathon: any) => {
         // Generate a unique NFT for the joined hackathon
         const newNFT = {
             ...hackathon,
@@ -16,7 +16,7 @@ const FitnessHackathonSlider = () => {
         };
 
         // Add the new NFT to the collection
-        setMyNFTs(prevNFTs => [...prevNFTs, newNFT]);
+        setMyNFTs((prevNFTs: any[]) => [...prevNFTs, newNFT]);
 
         // Switch to My Hackathon tab
         setActiveTab('my-nfts');

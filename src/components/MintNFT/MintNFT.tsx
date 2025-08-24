@@ -13,18 +13,24 @@ import { useAccount, useWriteContract } from 'wagmi'
 import { abi } from '@/abi/abi'
 import Link from 'next/link'
 
+interface AvatarImage {
+  url: string;
+  link: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+}
+
 export default function MintNFTPage() {
   const [isMinting, setIsMinting] = useState(false)
   const [nftName, setNftName] = useState('')
   // const [nftDescription, setNftDescription] = useState('')
-  const [mintedNFT, setMintedNFT] = useState(null)
-  const [avatarURL, setAvatarURL] = useState(null)
+  const [mintedNFT, setMintedNFT] = useState<AvatarImage | null>(null)
+  const [avatarURL, setAvatarURL] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
   const { address } = useAccount();
   const { data: hash, writeContract } = useWriteContract()
 
   // Array of avatar image paths
-  const avatarImages = [
+  const avatarImages: AvatarImage[] = [
     { url: '/avatar/bear1.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmcxerZCr21F1zN97NifdYfJjpNay8vpf17wkt9E2a3Ngo", rarity: 'common' },
     { url: '/avatar/bear2.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmNWTAK5M3GRx8R94NXsJA1n15GzkcrbmUA3t3gJyotNAw", rarity: 'rare' },
     { url: '/avatar/buffalo1.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmPfxSoDiwQX3Kb6UyEahKdP3UnyqHB6bcgrDJrY61v67X", rarity: 'uncommon' },
@@ -40,7 +46,7 @@ export default function MintNFTPage() {
   ];
 
 
-  const handleMint = async (e) => {
+  const handleMint = async (e: React.FormEvent) => {
     e.preventDefault();
     setMintedNFT(null);
     setAvatarURL(null);
@@ -55,7 +61,7 @@ export default function MintNFTPage() {
     try {
       await writeContract({
         abi: abi,
-        address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+        address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
         functionName: 'mintNFT',
         args: [nftName, address, randomImage.rarity, randomImage.link],
       });
@@ -66,7 +72,7 @@ export default function MintNFTPage() {
   };
 
   useEffect(() => {
-    if (hash != null && isMinting) {
+    if (hash != null && isMinting && mintedNFT) {
       // Select a random image
 
       console.log(hash);
@@ -76,9 +82,9 @@ export default function MintNFTPage() {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 5000);
     }
-  }, hash);
+  }, [hash, isMinting, mintedNFT]);
 
-  const rarityColors = {
+  const rarityColors: Record<AvatarImage['rarity'], string> = {
     common: "bg-gray-400 text-black",
     uncommon: "bg-green-400 text-black",
     rare: "bg-blue-400 text-white",
@@ -153,18 +159,20 @@ export default function MintNFTPage() {
                 <p className="mb-4">Your NFT "{nftName}" has been minted successfully!</p>
                 <div className="relative w-48 h-48 mx-auto border-4 border-white rounded-lg overflow-hidden">
                   <Image
-                    src={mintedNFT.url}
+                    src={mintedNFT?.url || ''}
                     alt={`Minted NFT: ${nftName}`}
                     layout="fill"
                     objectFit="cover"
                   />
                   {/* Rarity Badge */}
-                  <div
-                    className={`absolute top-2 right-2 px-2 py-1 rounded-lg ${rarityColors[mintedNFT.rarity] || "bg-black text-white"
-                      }`}
-                  >
-                    {mintedNFT.rarity.toUpperCase()}
-                  </div>
+                  {mintedNFT && (
+                    <div
+                      className={`absolute top-2 right-2 px-2 py-1 rounded-lg ${rarityColors[mintedNFT.rarity] || "bg-black text-white"
+                        }`}
+                    >
+                      {mintedNFT.rarity.toUpperCase()}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}

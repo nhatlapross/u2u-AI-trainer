@@ -65,7 +65,6 @@ const CardanoNavbar = () => {
             </button>
           </div>
         ) : (
-          // <CardanoWalletList />
           <button
             onClick={() => open()}
             className="bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded flex items-center space-x-2 text-sm"
@@ -91,7 +90,7 @@ const CardanoNavbar = () => {
                   <span>{`${address?.slice(0, 6)}...${address?.slice(-4)}`}</span>
                 </div>
                 <button
-                  onClick={disconnect}
+                  onClick={() => disconnect()}
                   className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm"
                 >
                   Disconnect

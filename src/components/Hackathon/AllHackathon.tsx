@@ -52,11 +52,11 @@ const hackathons = [
     }
 ];
 
-export default function AllHackathon({ onJoinHackathon }) {
-    const [joinedHackathons, setJoinedHackathons] = useState({});
-    const [loadingStates, setLoadingStates] = useState({});
+export default function AllHackathon({ onJoinHackathon }: { onJoinHackathon: (hackathon: any) => void }) {
+    const [joinedHackathons, setJoinedHackathons] = useState<{[key: number]: any}>({});
+    const [loadingStates, setLoadingStates] = useState<{[key: number]: boolean}>({});
 
-    const handleJoinHackathon = (hackathon) => {
+    const handleJoinHackathon = (hackathon: any) => {
         // Set loading state for this specific hackathon
         setLoadingStates(prev => ({
             ...prev,

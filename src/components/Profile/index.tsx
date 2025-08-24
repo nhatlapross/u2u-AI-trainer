@@ -17,16 +17,26 @@ const defaultProfile = {
   description: "Blockchain developer by day, fitness junkie by night. Leveraging Cardano for a healthier future."
 }
 
+interface UserStats {
+  level: number;
+  points: number;
+  lastUpdateDay: number;
+  currentNFT: any;
+  name?: string;
+  rarity?: string;
+  tokenUri?: string;
+  tokenId?: any;
+}
+
 export default function ProfilePage() {
-  const [userStats, setUserStats] = useState({
+  const [userStats, setUserStats] = useState<UserStats>({
     level: 10,
     points: 1567,
     lastUpdateDay: 68,
-    level: 1,
     currentNFT: null
   })
 
-  const [myBalance, SetMyBalance] = useState(0);
+  const [myBalance, SetMyBalance] = useState<string | number>(0);
   const [currentProfile, setCurrentProfile] = useState(defaultProfile);
   const [isNFTSelected, setIsNFTSelected] = useState(false);
   const { address } = useAccount()
@@ -36,12 +46,12 @@ export default function ProfilePage() {
   })
 
   useEffect(() => {
-    SetMyBalance(balance?.formatted)
+    SetMyBalance(balance?.formatted || 0)
   }, [balance])
 
   const { data: nftDetails, isLoading, error } = useReadContract({
     abi: abi,
-    address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+    address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
     functionName: 'getNFTDetailsByAddress',
     args: [address],
     query: {
@@ -49,7 +59,7 @@ export default function ProfilePage() {
     }
   })
 
-  const handleNFTUse = (nft) => {
+  const handleNFTUse = (nft: any) => {
     if (nft) {
       setUserStats({
         name: nft.name.toString() || '',
@@ -58,7 +68,8 @@ export default function ProfilePage() {
         rarity: nft.rarity|| '',
         lastUpdateDay: nft.lastUpdateDay.toString() || 0,
         tokenUri: nft.tokenUri.toString()|| '',
-        tokenId: nft.tokenId
+        tokenId: nft.tokenId,
+        currentNFT: nft
       })
       setIsNFTSelected(true)
       localStorage.setItem("userNFT",nft.tokenId.toString());
@@ -70,7 +81,7 @@ export default function ProfilePage() {
         points: 0,
         rarity: '',
         lastUpdateDay: 0,
-        tokenUri: null,
+        tokenUri: undefined,
         currentNFT: null
       })
       setIsNFTSelected(false)
@@ -79,8 +90,8 @@ export default function ProfilePage() {
 
   // If nftDetails are loaded and contain a usable NFT, use the first one
   useEffect(() => {
-    if (nftDetails && nftDetails.length > 0) {
-      const usingNFT = nftDetails.find(nft => nft.isUsing);
+    if (nftDetails && Array.isArray(nftDetails) && nftDetails.length > 0) {
+      const usingNFT = nftDetails.find((nft: any) => nft.isUsing);
       if (usingNFT) {
         handleNFTUse(usingNFT);
       }
@@ -90,7 +101,7 @@ export default function ProfilePage() {
       
       if(nft != null && nft != '') {
         console.log(nftDetails)
-        handleNFTUse(nftDetails.find(x => x.tokenId.toString() == nft.toString()));
+        handleNFTUse(nftDetails.find((x: any) => x.tokenId.toString() == nft.toString()));
         setIsNFTSelected(true);
       }
     }

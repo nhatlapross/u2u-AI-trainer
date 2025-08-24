@@ -2,13 +2,28 @@ import Image from 'next/image'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
+interface NFTCardProps {
+  nft: {
+    image: string;
+    name: string;
+    level: number;
+    days: number;
+    points: number;
+    price: number | null;
+  };
+  onSell: () => void;
+  onBuy: () => void;
+  isOwner: boolean;
+  showSellButton: boolean;
+}
+
 export default function NFTCard({ 
   nft, 
   onSell, 
   onBuy, 
   isOwner, 
   showSellButton 
-}) {
+}: NFTCardProps) {
   return (
     <Card className="overflow-hidden bg-gray-800 border-gray-700 transition-all duration-300 hover:scale-105 hover:shadow-lg">
       <CardContent className="p-0 relative">

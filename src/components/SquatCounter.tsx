@@ -296,7 +296,7 @@ const AdvancedSquatCounter: React.FC = () => {
   };
 
   useEffect(() => {
-    let camera;
+    let camera:any;
     let isComponentMounted = true;
     const currentVideo = videoRef.current;
 
@@ -326,21 +326,21 @@ const AdvancedSquatCounter: React.FC = () => {
 
         // Debug logging
         console.log('Mediapipe Pose Import:', mediapipePose);
-        console.log('Window Pose:', window.Pose);
+        console.log('Window Pose:', (window as any).Pose);
 
         // Ensure TensorFlow is ready
         await tf.ready();
         await tf.setBackend('webgl');
 
         // Create Pose instance using global Pose constructor or direct import
-        const PoseCtor = window.Pose || mediapipePose.Pose;
+        const PoseCtor = (window as any).Pose || mediapipePose.Pose;
 
         if (typeof PoseCtor !== 'function') {
           throw new Error('Pose constructor not found');
         }
 
         const pose = new PoseCtor({
-          locateFile: (file) => {
+          locateFile: (file:any) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
           }
         });
@@ -352,7 +352,7 @@ const AdvancedSquatCounter: React.FC = () => {
           minTrackingConfidence: 0.5
         });
 
-        pose.onResults((results) => {
+        pose.onResults((results:any) => {
           if (isComponentMounted) {
             drawPose(results);
             checkSquat(results.poseLandmarks);
@@ -360,7 +360,7 @@ const AdvancedSquatCounter: React.FC = () => {
         });
 
         // Initialize camera 
-        const CameraModule = mediapipeCamera.Camera || window.Camera;
+        const CameraModule = mediapipeCamera.Camera || (window as any).Camera;
 
         if (CameraModule && hasPermission && currentVideo) {
           camera = new CameraModule(currentVideo, {
@@ -382,7 +382,7 @@ const AdvancedSquatCounter: React.FC = () => {
             setIsLoading(false);
           }
         }
-      } catch (error) {
+      } catch (error:any) {
         console.error('Error setting up pose detection:', error);
         setError(`Failed to initialize: ${error.message}`);
         setIsLoading(false);
@@ -391,7 +391,7 @@ const AdvancedSquatCounter: React.FC = () => {
 
     // Add script to load MediaPipe globally
     const loadMediaPipeScript = () => {
-      if (isBrowser && !window.Pose) {
+      if (isBrowser && !(window as any).Pose) {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js';
         script.async = true;
@@ -411,7 +411,7 @@ const AdvancedSquatCounter: React.FC = () => {
       if (camera) {
         camera.stop();
       }
-      if (currentVideo?.srcObject) {
+      if (currentVideo?.srcObject && currentVideo.srcObject instanceof MediaStream) {
         const tracks = currentVideo.srcObject.getTracks();
         tracks.forEach(track => track.stop());
       }
