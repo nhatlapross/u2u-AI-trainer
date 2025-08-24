@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^0.38.19",
     "@martifylabs/mesh": "^1.2.0-beta.4",
     "@martifylabs/mesh-react": "^1.1.1",
     "@mediapipe/camera_utils": "^0.3.1675466862",
@@ -31,6 +32,7 @@
     "@walletconnect/react-native-compat": "^2.17.2",
     "@walletconnect/web3wallet": "^1.16.1",
     "@web3modal/wagmi": "^5.1.11",
+    "caniuse-lite": "^1.0.30001737",
     "cardano-wallet-js": "^1.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

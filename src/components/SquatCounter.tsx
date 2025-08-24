@@ -8,7 +8,12 @@ import { abi } from '@/abi/abi'
 // Safely check for browser environment
 const isBrowser = typeof window !== 'undefined';
 
-const findAngle = (p1, p2, p3) => {
+interface Point {
+  x: number;
+  y: number;
+}
+
+const findAngle = (p1: Point, p2: Point, p3: Point): number => {
   const radians = Math.atan2(p3.y - p2.y, p3.x - p2.x) -
     Math.atan2(p1.y - p2.y, p1.x - p2.x);
   let angle = Math.abs(radians * 180.0 / Math.PI);
@@ -18,28 +23,35 @@ const findAngle = (p1, p2, p3) => {
   return angle;
 };
 
-const AdvancedSquatCounter = () => {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+const AdvancedSquatCounter: React.FC = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [correctSquats, setCorrectSquats] = useState(0);
   const [incorrectSquats, setIncorrectSquats] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
   const [windowWidth, setWindowWidth] = useState(640);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [successAnimation, setSuccessAnimation] = useState(false);
-  const videoContainerRef = useRef(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
   const router = useRouter();
   const { data: hash, writeContract } = useWriteContract();
-  const [userNFT, setUserNFT] = useState(null);
-  const [dayNFT, setDayNFT] = useState(null);
+  const [userNFT, setUserNFT] = useState<string | null>(null);
+  const [dayNFT, setDayNFT] = useState<string | null>(null);
 
   // State tracking
-  const stateRef = useRef({
+  interface StateTracker {
+    stateSeq: string[];
+    currentState: string | null;
+    prevState: string | null;
+    incorrectPosture: boolean;
+  }
+
+  const stateRef = useRef<StateTracker>({
     stateSeq: [],
     currentState: null,
     prevState: null,
@@ -129,7 +141,7 @@ const AdvancedSquatCounter = () => {
     }
   };
 
-  const getSquatState = (kneeAngle) => {
+  const getSquatState = (kneeAngle: number): string | null => {
     if (THRESHOLDS.HIP_KNEE_VERT.NORMAL[0] <= kneeAngle &&
       kneeAngle <= THRESHOLDS.HIP_KNEE_VERT.NORMAL[1]) {
       return 's1';
@@ -143,7 +155,7 @@ const AdvancedSquatCounter = () => {
     return null;
   };
 
-  const updateStateSequence = (state) => {
+  const updateStateSequence = (state: string): void => {
     const stateTracker = stateRef.current;
 
     if (state === 's2') {
@@ -161,7 +173,7 @@ const AdvancedSquatCounter = () => {
     }
   };
 
-  const checkSquat = (landmarks) => {
+  const checkSquat = (landmarks: any[]): void => {
     if (!landmarks) return;
 
     const nose = landmarks[0];
@@ -245,26 +257,40 @@ const AdvancedSquatCounter = () => {
 
   const toggleFullScreen = () => {
     const container = videoContainerRef.current;
+    if (!container) return;
+
+    // Type assertion to include browser-specific fullscreen methods
+    const containerElement = container as HTMLDivElement & {
+      mozRequestFullScreen?: () => Promise<void>;
+      webkitRequestFullscreen?: () => Promise<void>;
+      msRequestFullscreen?: () => Promise<void>;
+    };
+
+    const documentElement = document as Document & {
+      mozCancelFullScreen?: () => Promise<void>;
+      webkitExitFullscreen?: () => Promise<void>;
+      msExitFullscreen?: () => Promise<void>;
+    };
 
     if (!isFullScreen) {
-      if (container.requestFullscreen) {
-        container.requestFullscreen();
-      } else if (container.mozRequestFullScreen) {
-        container.mozRequestFullScreen();
-      } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
-      } else if (container.msRequestFullscreen) {
-        container.msRequestFullscreen();
+      if (containerElement.requestFullscreen) {
+        containerElement.requestFullscreen();
+      } else if (containerElement.mozRequestFullScreen) {
+        containerElement.mozRequestFullScreen();
+      } else if (containerElement.webkitRequestFullscreen) {
+        containerElement.webkitRequestFullscreen();
+      } else if (containerElement.msRequestFullscreen) {
+        containerElement.msRequestFullscreen();
       }
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
+      if (documentElement.exitFullscreen) {
+        documentElement.exitFullscreen();
+      } else if (documentElement.mozCancelFullScreen) {
+        documentElement.mozCancelFullScreen();
+      } else if (documentElement.webkitExitFullscreen) {
+        documentElement.webkitExitFullscreen();
+      } else if (documentElement.msExitFullscreen) {
+        documentElement.msExitFullscreen();
       }
     }
   };
@@ -392,11 +418,13 @@ const AdvancedSquatCounter = () => {
     };
   }, [hasPermission, isLoading]);
 
-  const drawPose = (results) => {
+  const drawPose = (results: any): void => {
     const canvas = canvasRef.current;
     if (!canvas || !results.poseLandmarks) return;
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw landmarks
@@ -442,15 +470,15 @@ const AdvancedSquatCounter = () => {
     let currentDate = getCurrentDate();
     try {
       await writeContract({
-        abi: abi,
-        address: process.env.NEXT_PUBLIC_WEFIT_NFT,
+        abi,
+        address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
         functionName: 'completeMission',
-        args: [userNFT, parseInt(dayNFT)+1],
+        args: [userNFT as `0x${string}`, BigInt(parseInt(dayNFT || '0') + 1)],
       });
     } catch (error) {
       console.error('Minting failed:', error);
       alert('Claim failed!');
-      localStorage.setItem("dayNFT",(parseInt(dayNFT)+1).toString());
+      localStorage.setItem("dayNFT",(parseInt(dayNFT || '0') + 1).toString());
       router.push('/mission');
     }
   }
@@ -502,7 +530,7 @@ const AdvancedSquatCounter = () => {
 
 
   // Reward Modal Component
-  const RewardModal = () => {
+  const RewardModal: React.FC = () => {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
         <div className="bg-gray-800 rounded-xl p-6 max-w-sm w-full mx-4 text-center">
