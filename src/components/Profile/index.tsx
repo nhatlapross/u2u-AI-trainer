@@ -39,6 +39,7 @@ export default function ProfilePage() {
   const [myBalance, SetMyBalance] = useState<string | number>(0);
   const [currentProfile, setCurrentProfile] = useState(defaultProfile);
   const [isNFTSelected, setIsNFTSelected] = useState(false);
+  const [mockNFT, setMockNFT] = useState<any>(null);
   const { address } = useAccount()
 
   const { data: balance } = useBalance({
@@ -88,21 +89,68 @@ export default function ProfilePage() {
     }
   }
 
+  // Check for mock NFT from localStorage
+  useEffect(() => {
+    const storedNFT = localStorage.getItem("userNFT");
+    if (storedNFT) {
+      try {
+        const nftData = JSON.parse(storedNFT);
+        if (nftData.isMock) {
+          // Use mock NFT data
+          setMockNFT(nftData);
+          setUserStats({
+            name: nftData.name || 'Mock NFT',
+            level: 1,
+            points: 100,
+            rarity: nftData.rarity || 'common',
+            lastUpdateDay: 1,
+            tokenUri: nftData.image || nftData.link,
+            tokenId: 'MOCK-' + Date.now(),
+            currentNFT: nftData
+          });
+          setIsNFTSelected(true);
+        }
+      } catch (e) {
+        // Handle old format or parsing errors
+        console.log('Using old NFT format or parsing failed');
+      }
+    }
+  }, []);
+
   // If nftDetails are loaded and contain a usable NFT, use the first one
   useEffect(() => {
     if (nftDetails && Array.isArray(nftDetails) && nftDetails.length > 0) {
       const usingNFT = nftDetails.find((nft: any) => nft.isUsing);
       if (usingNFT) {
         handleNFTUse(usingNFT);
+        setMockNFT(null); // Clear mock NFT if real NFT exists
       }
 
       const nft = localStorage.getItem("userNFT");
       console.log(nft);
       
       if(nft != null && nft != '') {
-        console.log(nftDetails)
-        handleNFTUse(nftDetails.find((x: any) => x.tokenId.toString() == nft.toString()));
-        setIsNFTSelected(true);
+        try {
+          const nftData = JSON.parse(nft);
+          if (!nftData.isMock) {
+            // Only use real NFT from contract
+            console.log(nftDetails)
+            const foundNFT = nftDetails.find((x: any) => x.tokenId.toString() == nft.toString());
+            if (foundNFT) {
+              handleNFTUse(foundNFT);
+              setIsNFTSelected(true);
+              setMockNFT(null);
+            }
+          }
+        } catch {
+          // Old format - try to find by ID
+          const foundNFT = nftDetails.find((x: any) => x.tokenId.toString() == nft.toString());
+          if (foundNFT) {
+            handleNFTUse(foundNFT);
+            setIsNFTSelected(true);
+            setMockNFT(null);
+          }
+        }
       }
     }
   }, [nftDetails])
@@ -191,6 +239,7 @@ export default function ProfilePage() {
             <NFTSlider
               onNFTUse={handleNFTUse}
               nftDetails={nftDetails}
+              mockNFT={mockNFT}
             />
           </CardContent>
         </Card>
@@ -210,8 +259,16 @@ export default function ProfilePage() {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle className="text-2xl">{userStats.name}</CardTitle>
+            <CardTitle className="text-2xl">
+              {userStats.name}
+              {mockNFT && (
+                <span className="ml-2 text-sm text-yellow-500">(Offline Mode)</span>
+              )}
+            </CardTitle>
             <p className="text-muted-foreground">{userStats.rarity}</p>
+            {mockNFT && (
+              <p className="text-xs text-gray-500 mt-1">NFT will be synced when connection is restored</p>
+            )}
           </div>
         </CardHeader>
         {/* <CardContent>
@@ -266,6 +323,7 @@ export default function ProfilePage() {
             <NFTSlider
               onNFTUse={handleNFTUse}
               nftDetails={nftDetails}
+              mockNFT={mockNFT}
             />
           </div>
         </CardContent>

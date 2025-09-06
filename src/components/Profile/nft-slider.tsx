@@ -24,9 +24,10 @@ import { abi } from '@/abi/abi'
 interface NFTSliderProps {
   onNFTUse: (nft: any) => void;
   nftDetails?: any;
+  mockNFT?: any;
 }
 
-export default function NFTSlider({ onNFTUse, nftDetails }: NFTSliderProps) {
+export default function NFTSlider({ onNFTUse, nftDetails, mockNFT }: NFTSliderProps) {
   // State to hold NFTs with default empty array
   const [nfts, setNFTs] = useState<any[]>([])
   const [selectedNFT, setSelectedNFT] = useState<any>(null)
@@ -61,6 +62,25 @@ export default function NFTSlider({ onNFTUse, nftDetails }: NFTSliderProps) {
 
   // Transform contract NFT data to component's NFT interface
   useEffect(() => {
+    const nftList = [];
+    
+    // Add mock NFT if exists
+    if (mockNFT) {
+      nftList.push({
+        tokenId: 'MOCK-' + (mockNFT.timestamp || Date.now()),
+        lastUpdateDay: 1,
+        level: 1,
+        name: mockNFT.name || 'Mock NFT',
+        points: 100,
+        rarity: mockNFT.rarity || 'common',
+        tokenUri: mockNFT.image || mockNFT.link,
+        isUsing: true,
+        isSelling: false,
+        isMock: true
+      });
+    }
+    
+    // Add real NFTs from contract
     if (activeNftDetails && Array.isArray(activeNftDetails)) {
       const transformedNFTs = activeNftDetails.map((nft: any) => ({
         tokenId: nft.tokenId,
@@ -71,12 +91,15 @@ export default function NFTSlider({ onNFTUse, nftDetails }: NFTSliderProps) {
         rarity: nft.rarity,
         tokenUri: nft.tokenUri,
         isUsing: false,
-        isSelling: false
+        isSelling: false,
+        isMock: false
       }))
       
-      setNFTs(transformedNFTs)
+      nftList.push(...transformedNFTs);
     }
-  }, [activeNftDetails])
+    
+    setNFTs(nftList);
+  }, [activeNftDetails, mockNFT])
 
   const handleNFTClick = (nft: any) => {
     if (!nft.isSelling) {
@@ -193,6 +216,14 @@ export default function NFTSlider({ onNFTUse, nftDetails }: NFTSliderProps) {
                           Selling
                         </Badge>
                       )}
+                      {nft.isMock && (
+                        <Badge 
+                          variant="outline" 
+                          className="absolute bottom-0 left-0 bg-yellow-500/20 text-yellow-500 border-yellow-500"
+                        >
+                          Offline
+                        </Badge>
+                      )}
                     </div>
                     <h4 className="font-semibold">{nft.name}</h4>
                     {nft.isSelling && (
@@ -222,8 +253,17 @@ export default function NFTSlider({ onNFTUse, nftDetails }: NFTSliderProps) {
         <Dialog open={!!selectedNFT} onOpenChange={handleCloseModal}>
           <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white">
             <DialogHeader>
-              <DialogTitle>{selectedNFT.name}</DialogTitle>
-              <DialogDescription>NFT Details</DialogDescription>
+              <DialogTitle>
+                {selectedNFT.name}
+                {selectedNFT.isMock && (
+                  <span className="ml-2 text-sm text-yellow-500">(Offline Mode)</span>
+                )}
+              </DialogTitle>
+              <DialogDescription>
+                {selectedNFT.isMock 
+                  ? "This is a mock NFT for offline testing" 
+                  : "NFT Details"}
+              </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
@@ -253,7 +293,7 @@ export default function NFTSlider({ onNFTUse, nftDetails }: NFTSliderProps) {
                 <Button 
                   variant="destructive" 
                   onClick={() => redeemPoint()}
-                  disabled={isMinting}
+                  disabled={isMinting || selectedNFT.isMock}
                   className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
                 >
                   {isMinting ? "Redeeming..." : "Redeem"}

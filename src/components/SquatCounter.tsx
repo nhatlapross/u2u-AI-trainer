@@ -81,10 +81,22 @@ const AdvancedSquatCounter: React.FC = () => {
   useEffect(()=>{
     const nft = localStorage.getItem("userNFT");
     if(nft != null && nft != '') {
-      setTimeout(() => {
-        setUserNFT(nft.toString());
-      }, 100);
-
+      try {
+        // Check if it's JSON (new format with mock data)
+        const nftData = JSON.parse(nft);
+        setTimeout(() => {
+          // Use the NFT data whether it's mock or real
+          setUserNFT(nftData.name || nft.toString());
+          if (nftData.isMock) {
+            console.log('Using mock NFT data for gameplay');
+          }
+        }, 100);
+      } catch {
+        // Fall back to old format (just string)
+        setTimeout(() => {
+          setUserNFT(nft.toString());
+        }, 100);
+      }
     }
     const day = localStorage.getItem("dayNFT");
     if(day!= null && day != '') {
