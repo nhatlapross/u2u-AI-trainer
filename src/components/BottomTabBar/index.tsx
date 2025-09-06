@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, Dumbbell, Trophy, Store, User, Target, Wallet, LogOut } from 'lucide-react';
+import { Home, Dumbbell, Trophy, Store, User, Target, Wallet, LogOut, Copy, Check } from 'lucide-react';
 import { useAccount, useDisconnect } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 
@@ -12,6 +12,7 @@ const BottomTabBar = () => {
   const { disconnect } = useDisconnect();
   const { open } = useWeb3Modal();
   const [showWalletMenu, setShowWalletMenu] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const tabs = [
     { 
@@ -62,16 +63,44 @@ const BottomTabBar = () => {
     setShowWalletMenu(false);
   };
 
+  const handleCopyAddress = async () => {
+    if (address) {
+      try {
+        await navigator.clipboard.writeText(address);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy address:', err);
+      }
+    }
+  };
+
   return (
     <>
       {/* Wallet Menu Popup */}
       {showWalletMenu && (
-        <div className="fixed bottom-20 right-4 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 p-4 min-w-[200px]">
+        <div className="fixed bottom-20 right-4 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 p-4 min-w-[240px]">
           <div className="flex flex-col space-y-3">
             <div className="text-sm text-gray-400">Connected Wallet</div>
-            <div className="text-white font-mono text-sm">
-              {`${address?.slice(0, 6)}...${address?.slice(-4)}`}
+            <div className="flex items-center gap-2">
+              <div className="text-white font-mono text-sm flex-1">
+                {`${address?.slice(0, 6)}...${address?.slice(-4)}`}
+              </div>
+              <button
+                onClick={handleCopyAddress}
+                className="p-1.5 rounded hover:bg-gray-700 transition-colors"
+                title="Copy address"
+              >
+                {copied ? (
+                  <Check size={16} className="text-green-400" />
+                ) : (
+                  <Copy size={16} className="text-gray-400 hover:text-white" />
+                )}
+              </button>
             </div>
+            {copied && (
+              <div className="text-xs text-green-400">Address copied!</div>
+            )}
             <button
               onClick={handleDisconnect}
               className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
