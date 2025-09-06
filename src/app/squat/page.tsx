@@ -1,8 +1,9 @@
+'use client';
+
 import React from "react";
-import { NextPage } from 'next';
 import SquatCounter from "@/components/SquatCounter";
 
-const SquatPage: NextPage = () => {
+const SquatPage = () => {
   return (
     <div>
       <SquatCounter />

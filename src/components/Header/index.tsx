@@ -27,18 +27,18 @@ const CardanoNavbar = () => {
   return (
     <nav className="relative flex justify-between items-center p-4 bg-gray-800 text-white">
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2" onClick={() => router.push('/')}>
+        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => router.push('/')}>
           <Dumbbell className="w-8 h-8 text-blue-500" />
           <h2 className="text-2xl font-bold">Wefit365</h2>
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-4">
-          <a className="hover:text-gray-300" onClick={() => router.push('/mint')}>Mint</a>
-          <a className="hover:text-gray-300" onClick={() => router.push('/mission')}>Exercie</a>
-          <a className="hover:text-gray-300" onClick={() => router.push('/hackathon')}>Hackathon</a>
-          <a className="hover:text-gray-300" onClick={() => router.push('/profile')}>Profile</a>
-          <a className="hover:text-gray-300" onClick={() => router.push('/marketplace')}>Market</a>
+          <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/mint')}>Mint</button>
+          <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/mission')}>Exercise</button>
+          <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/hackathon')}>Hackathon</button>
+          <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/profile')}>Profile</button>
+          <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/marketplace')}>Market</button>
         </div>
       </div>
 
@@ -78,11 +78,11 @@ const CardanoNavbar = () => {
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-gray-800 z-50">
           <div className="flex flex-col items-center py-4 space-y-4">
-            <a className="hover:text-gray-300" onClick={() => router.push('/mint')}>Mint</a>
-            <a className="hover:text-gray-300" onClick={() => router.push('/mission')}>Exercie</a>
-            <a className="hover:text-gray-300" onClick={() => router.push('/hackathon')}>Hackathon</a>
-            <a className="hover:text-gray-300" onClick={() => router.push('/profile')}>Profile</a>
-            <a className="hover:text-gray-300" onClick={() => router.push('/marketplace')}>Market</a>
+            <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/mint')}>Mint</button>
+            <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/mission')}>Exercise</button>
+            <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/hackathon')}>Hackathon</button>
+            <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/profile')}>Profile</button>
+            <button className="hover:text-gray-300 cursor-pointer" onClick={() => router.push('/marketplace')}>Market</button>
             {isConnected ? (
               <div className="flex flex-col items-center space-y-2">
                 <div className="flex items-center space-x-2">

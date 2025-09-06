@@ -1,11 +1,14 @@
-import React from "react";
-import { NextPage } from 'next';
-import ProfilePage from "@/components/Profile/index";
+'use client';
 
-const NFTMissionsPage: NextPage = () => {
+import React from "react";
+import MissionCards from "@/components/ListNFT/MissionCards";
+
+const NFTMissionsPage = () => {
   return (
     <div className="bg-gray-900 min-h-screen text-white flex items-center justify-center">
-      <ProfilePage />
+      <div className="w-full">
+        <MissionCards />
+      </div>
     </div>
   )
 }

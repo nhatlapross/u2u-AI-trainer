@@ -1,8 +1,9 @@
-import { NextPage } from 'next';
+'use client';
+
 import { useRouter } from 'next/navigation';
 import SquatTutorial from '@/components/Tutorial/tutorial';
 
-const SquatTutorialPage: NextPage = () => {
+const SquatTutorialPage = () => {
     const router = useRouter();
     
     return (

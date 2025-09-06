@@ -132,13 +132,14 @@ export default function MissionCards() {
             <Button 
               variant="outline" 
               onClick={handleTutorial}
-              className="w-full"
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
             >
               View Tutorial
             </Button>
             <Button 
+              variant="outline"
               onClick={handleExercise}
-              className="w-full"
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
             >
               Start Exercise
             </Button>

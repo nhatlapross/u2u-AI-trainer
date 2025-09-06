@@ -82,7 +82,7 @@ export default function BlockchainFitnessLanding() {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-gray-700 text-white hover:bg-gray-800 transition-all"
+                className="border-gray-700 text-black hover:bg-gray-800 transition-all"
                 onClick={() => router.push('/mint')}
               >
                 Learn More

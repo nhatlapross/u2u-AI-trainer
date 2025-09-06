@@ -376,6 +376,29 @@ const AdvancedSquatCounter: React.FC = () => {
           try {
             await camera.start();
             setIsLoading(false);
+            // Auto trigger fullscreen after camera starts
+            setTimeout(() => {
+              const container = videoContainerRef.current;
+              if (container && !document.fullscreenElement) {
+                const containerElement = container as HTMLDivElement & {
+                  mozRequestFullScreen?: () => Promise<void>;
+                  webkitRequestFullscreen?: () => Promise<void>;
+                  msRequestFullscreen?: () => Promise<void>;
+                };
+                
+                if (containerElement.requestFullscreen) {
+                  containerElement.requestFullscreen().catch(err => {
+                    console.log('Auto fullscreen failed:', err);
+                  });
+                } else if (containerElement.mozRequestFullScreen) {
+                  containerElement.mozRequestFullScreen();
+                } else if (containerElement.webkitRequestFullscreen) {
+                  containerElement.webkitRequestFullscreen();
+                } else if (containerElement.msRequestFullscreen) {
+                  containerElement.msRequestFullscreen();
+                }
+              }
+            }, 500); // Small delay to ensure camera is fully initialized
           } catch (cameraError) {
             console.error('Error starting camera:', cameraError);
             setError('Failed to start camera. Please refresh and try again.');

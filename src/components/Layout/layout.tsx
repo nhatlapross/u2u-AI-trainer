@@ -1,7 +1,7 @@
 'use client';
 import { ReactNode, useEffect } from 'react';
-import Navbar from '../Header/index';
-import Footer from '../Footer/index';
+import BottomTabBar from '../BottomTabBar/index';
+import WalletGuard from '../WalletGuard/index';
 import { useMiniKit } from '@coinbase/onchainkit/minikit';
 
 interface LayoutProps {
@@ -14,11 +14,13 @@ export default function Layout({ children }: LayoutProps) {
   useEffect(() => {
     if (!isFrameReady) setFrameReady();
   }, [isFrameReady, setFrameReady]);
+  
   return (
-    <>
-      <Navbar />
-      <main>{children}</main>
-      <Footer />
-    </>
+    <WalletGuard>
+      <main className="pb-16">
+        {children}
+      </main>
+      <BottomTabBar />
+    </WalletGuard>
   )
 }
