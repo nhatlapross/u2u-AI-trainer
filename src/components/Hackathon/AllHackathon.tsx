@@ -86,138 +86,88 @@ export default function AllHackathon({ onJoinHackathon }: { onJoinHackathon: (ha
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center py-16">
-            <Swiper
-                effect={'coverflow'}
-                loop={true}
-                grabCursor={true}
-                centeredSlides={true}
-                spaceBetween={30}
-                breakpoints={{
-                    320: {
-                        slidesPerView: 1,
-                        coverflowEffect: {
-                            rotate: 30,
-                            stretch: 0,
-                            depth: 50,
-                            modifier: 1,
-                            slideShadows: false,
-                        }
-                    },
-                    768: {
-                        slidesPerView: 2,
-                        coverflowEffect: {
-                            rotate: 40,
-                            stretch: 0,
-                            depth: 75,
-                            modifier: 1,
-                            slideShadows: true,
-                        }
-                    },
-                    1024: {
-                        slidesPerView: 3,
-                        coverflowEffect: {
-                            rotate: 50,
-                            stretch: 0,
-                            depth: 100,
-                            modifier: 1,
-                            slideShadows: true,
-                        }
-                    }
-                }}
-                pagination={{
-                    clickable: true,
-                }}
-                modules={[EffectCoverflow, Pagination]}
-                className="w-full max-w-[1100px] h-[500px] px-4"
-            >
-                {hackathons.map((hackathon) => (
-                    <SwiperSlide key={hackathon.id} className="flex items-center justify-center">
-                        <div className="bg-gray-800 shadow-2xl rounded-lg overflow-hidden w-full max-w-sm">
+        <div className="space-y-3">
+            {hackathons.map((hackathon) => (
+                <div key={hackathon.id} className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+                    <div className="flex space-x-4">
+                        {/* Image */}
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-black bg-white flex-shrink-0">
                             <img
                                 src={hackathon.image}
                                 alt={hackathon.name}
-                                className="w-full h-64 object-cover"
+                                className="w-full h-full object-cover"
                             />
-                            <div className="p-6">
-                                <h2 className="text-xl font-semibold mb-2 text-white">{hackathon.name}</h2>
-
-                                <div className="grid grid-cols-1 gap-2 mb-4 text-gray-300">
-                                    <div className="flex justify-between text-sm">
-                                        <p className="text-sm text-gray-500">Type</p>
-                                        <p className="font-medium">{hackathon.type}</p>
-                                    </div>
-
-                                    <div className="flex justify-between text-sm">
-                                        <p className="text-sm text-gray-500">Dates</p>
-                                        <p className="font-medium">
-                                            {new Date(hackathon.startDate).toLocaleDateString()} -
-                                            {new Date(hackathon.endDate).toLocaleDateString()}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex justify-between text-sm">
-                                        <p className="text-sm text-gray-500">Participants</p>
-                                        <p className="font-medium">
-                                            {hackathon.participants}/{hackathon.maxParticipants}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex justify-between text-sm">
-                                        <p className="text-sm text-gray-500">Price</p>
-                                        <p className="font-medium">${hackathon.price}</p>
-                                    </div>
-                                </div>
-
-                                {joinedHackathons[hackathon.id] ? (
-                                    <div className="w-full bg-green-600 text-white py-2 rounded-lg text-center">
-                                        <p>Joined Successfully</p>
-                                        <p className="text-sm">
-                                            Joined at: {joinedHackathons[hackathon.id].joinedAt}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={() => handleJoinHackathon(hackathon)}
-                                        disabled={loadingStates[hackathon.id]}
-                                        className={`w-full text-white py-2 rounded-lg transition ${
-                                            loadingStates[hackathon.id] 
-                                                ? 'bg-gray-500 cursor-not-allowed' 
-                                                : 'bg-blue-500 hover:bg-blue-600'
-                                        }`}
-                                    >
-                                        {loadingStates[hackathon.id] ? (
-                                            <div className="flex items-center justify-center">
-                                                <svg 
-                                                    className="animate-spin h-5 w-5 mr-3" 
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <circle 
-                                                        className="opacity-25" 
-                                                        cx="12" 
-                                                        cy="12" 
-                                                        r="10" 
-                                                        stroke="currentColor" 
-                                                        strokeWidth="4"
-                                                    ></circle>
-                                                    <path 
-                                                        className="opacity-75" 
-                                                        fill="currentColor" 
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                    ></path>
-                                                </svg>
-                                                Joining...
-                                            </div>
-                                        ) : (
-                                            'Join Hackathon'
-                                        )}
-                                    </button>
-                                )}
-                            </div>
                         </div>
-                    </SwiperSlide>
-                ))}
-            </Swiper>
+                        
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-bold text-black truncate mb-2">
+                                {hackathon.name}
+                            </h3>
+                            
+                            <div className="space-y-1 mb-3">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-black/70">Type:</span>
+                                    <span className="font-medium text-black capitalize">{hackathon.type}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-black/70">Duration:</span>
+                                    <span className="font-medium text-black text-xs">
+                                        {new Date(hackathon.startDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - {new Date(hackathon.endDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-black/70">Participants:</span>
+                                    <span className="font-medium text-black">
+                                        {hackathon.participants}/{hackathon.maxParticipants}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-black/70">Price:</span>
+                                    <span className="font-bold text-green-600">${hackathon.price}</span>
+                                </div>
+                            </div>
+                            
+                            {/* Progress Bar */}
+                            <div className="w-full bg-black/20 rounded-full h-2 mb-3">
+                                <div 
+                                    className="bg-orange-600 h-2 rounded-full transition-all duration-300"
+                                    style={{width: `${(hackathon.participants / hackathon.maxParticipants) * 100}%`}}
+                                ></div>
+                            </div>
+                            
+                            {/* Join Button */}
+                            {joinedHackathons[hackathon.id] ? (
+                                <div className="bg-green-500 border-t-2 border-l-2 border-r-4 border-b-4 border-black text-white py-2 px-4 rounded-xl text-center">
+                                    <p className="font-bold text-sm">Joined Successfully!</p>
+                                    <p className="text-xs opacity-90">
+                                        {joinedHackathons[hackathon.id].joinedAt}
+                                    </p>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => handleJoinHackathon(hackathon)}
+                                    disabled={loadingStates[hackathon.id]}
+                                    className={`w-full font-bold py-2 px-4 rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black transition-all duration-200 ${
+                                        loadingStates[hackathon.id] 
+                                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                                            : 'bg-orange-500 text-white hover:bg-orange-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2'
+                                    }`}
+                                >
+                                    {loadingStates[hackathon.id] ? (
+                                        <div className="flex items-center justify-center">
+                                            <div className="w-4 h-4 border-2 border-gray-600 border-t-2 border-t-transparent rounded-full animate-spin mr-2"></div>
+                                            Joining...
+                                        </div>
+                                    ) : (
+                                        'Join Hackathon'
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            ))}
         </div>
     )
 }

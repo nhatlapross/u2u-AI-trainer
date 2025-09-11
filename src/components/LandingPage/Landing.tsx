@@ -1,118 +1,167 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Button } from "@/components/ui/button"
-import { Zap, Trophy, Clock, Shield, ArrowRight } from 'lucide-react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { ArrowRight, ArrowLeft, Zap, Trophy, Gift, Users, Hand } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function BlockchainFitnessLanding() {
-    const router = useRouter();
-    const containerRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  })
+// Dynamic import framer-motion with proper types
+const MotionDiv = dynamic(
+  () => import('framer-motion').then((mod) => {
+    const MotionComponent = ({ children, ...props }: any) => {
+      const { motion } = mod
+      return <motion.div {...props}>{children}</motion.div>
+    }
+    return MotionComponent
+  }),
+  { ssr: false }
+)
 
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, -200])
-  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.5])
+const AnimatePresence = dynamic(
+  () => import('framer-motion').then((mod) => mod.AnimatePresence),
+  { ssr: false }
+)
 
-  const features = [
+export default function OnboardingTutorial() {
+  const router = useRouter();
+  const [currentStep, setCurrentStep] = useState(0)
+
+  const steps = [
     {
-      title: "Mint Your Fitness NFT",
-      description: "Create a unique digital fitness persona that grows with your journey.",
-      icon: <Zap className="w-8 h-8 text-blue-400" />,
-      gradient: "from-blue-500 to-purple-600"
+      title: "Welcome to Boar!",
+      description: "Start your fitness journey with blockchain rewards",
+      icon: <Hand className="w-16 h-16 text-black" />,
+      content: "Transform your fitness routine into an exciting game where every workout counts!"
     },
     {
-      title: "AI-Powered Training",
-      description: "Real-time tracking, personalized coaching, and intelligent workout planning.",
-      icon: <Trophy className="w-8 h-8 text-green-400" />,
-      gradient: "from-green-500 to-teal-600"
+      title: "Step 1: Mint Your NFT",
+      description: "Create your unique fitness character",
+      icon: <Zap className="w-16 h-16 text-black" />,
+      content: "Choose your name and mint a unique NFT. Each NFT has different rarity levels that boost your bonus points!"
     },
     {
-      title: "Global Fitness Challenges",
-      description: "Compete worldwide, earn crypto rewards, and push your limits.",
-      icon: <Clock className="w-8 h-8 text-red-400" />,
-      gradient: "from-red-500 to-orange-600"
+      title: "Step 2: Train Daily",
+      description: "Work out with your NFT to earn points",
+      icon: <Trophy className="w-16 h-16 text-black" />,
+      content: "Select your NFT for daily workouts. Complete exercises to earn points and level up your character!"
     },
     {
-      title: "Secure Blockchain Management",
-      description: "Transparent, decentralized tracking of your fitness achievements and assets.",
-      icon: <Shield className="w-8 h-8 text-purple-400" />,
-      gradient: "from-purple-500 to-indigo-600"
+      title: "Step 3: Earn Rewards",
+      description: "Exchange points for amazing prizes",
+      icon: <Gift className="w-16 h-16 text-black" />,
+      content: "Use your earned points to redeem vouchers, discounts, and exclusive fitness gear!"
+    },
+    {
+      title: "Step 4: Join Community",
+      description: "Trade NFTs and compete in contests",
+      icon: <Users className="w-16 h-16 text-black" />,
+      content: "Sell your NFTs on the marketplace and participate in fitness challenges to win amazing prizes!"
     }
   ]
 
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1)
+    } else {
+      // Mark onboarding as completed
+      localStorage.setItem('hasCompletedOnboarding', 'true')
+      router.push('/mint')
+    }
+  }
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const skipTutorial = () => {
+    // Mark onboarding as completed when skipping
+    localStorage.setItem('hasCompletedOnboarding', 'true')
+    router.push('/mint')
+  }
+
   return (
-    <div 
-      ref={containerRef} 
-      className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900"
-    >
-      <motion.main 
-        style={{
-          translateY: heroY,
-          scale: heroScale,
-          opacity: heroOpacity
-        }}
-        className="relative z-10"
-      >
-        <section className="container mx-auto px-4 py-24 text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="max-w-4xl mx-auto"
+    <div className="min-h-screen bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full">
+        <AnimatePresence mode="wait">
+          <MotionDiv
+            key={currentStep}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.3 }}
+            className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-8 shadow-lg text-center"
           >
-            <h1 className="text-5xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-              Transform Fitness with Blockchain & AI
+            {/* Progress bar */}
+            <div className="flex justify-center mb-6">
+              {steps.map((_, index) => (
+                <div
+                  key={index}
+                  className={`h-2 w-12 mx-1 rounded-full ${
+                    index <= currentStep ? 'bg-black' : 'bg-black/20'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Icon */}
+            <div className="flex justify-center mb-6">
+              {steps[currentStep].icon}
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl font-bold text-black mb-4">
+              {steps[currentStep].title}
             </h1>
-            <p className="text-xl mb-10 text-gray-300 max-w-2xl mx-auto">
-              Revolutionize your health journey through cutting-edge technology, personalized AI training, and decentralized fitness rewards.
+
+            {/* Description */}
+            <p className="text-lg font-semibold text-black/80 mb-6">
+              {steps[currentStep].description}
             </p>
-            <div className="space-x-4">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:opacity-90 transition-all"
+
+            {/* Content */}
+            <p className="text-black/70 text-base mb-8 max-w-lg mx-auto">
+              {steps[currentStep].content}
+            </p>
+
+            {/* Navigation buttons */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex justify-center items-center gap-4">
+                <Button
+                  onClick={prevStep}
+                  disabled={currentStep === 0}
+                  variant="outline"
+                  className={`border-t-2 border-l-2 border-r-4 border-b-4 border-black text-black hover:bg-black hover:text-yellow-400 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2 transition-all duration-200 ${
+                    currentStep === 0 ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <ArrowLeft className="mr-2 w-4 h-4" />
+                  Back
+                </Button>
+
+                <Button
+                  onClick={nextStep}
+                  variant="outline"
+                  className="border-t-2 border-l-2 border-r-4 border-b-4 border-black text-black hover:bg-black hover:text-yellow-400 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2 transition-all duration-200"
+                >
+                  {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </div>
+
+              <Button
+                onClick={skipTutorial}
+                variant="ghost"
+                className="text-black/60 hover:text-black underline active:transform active:scale-95 transition-all duration-200"
               >
-                Start Your Journey
-                <ArrowRight className="ml-2" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-gray-700 text-black hover:bg-gray-800 transition-all"
-                onClick={() => router.push('/mint')}
-              >
-                Learn More
+                Skip Tutorial
               </Button>
             </div>
-          </motion.div>
-        </section>
-
-        <section className="container mx-auto px-4 py-16">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-                className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:scale-105 transition-all group"
-              >
-                <div className="flex items-center mb-4">
-                  {feature.icon}
-                  <h3 className={`ml-4 text-xl font-bold bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}>
-                    {feature.title}
-                  </h3>
-                </div>
-                <p className="text-gray-400">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      </motion.main>
+          </MotionDiv>
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

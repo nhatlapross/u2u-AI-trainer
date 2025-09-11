@@ -76,73 +76,87 @@ export default function MissionCards() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {missions.map((mission, index) => (
-          <Button
-            key={index}
-            variant="ghost"
-            className={`w-full h-full p-0 hover:bg-transparent ${mission.isLocked ? 'cursor-not-allowed' : 'hover:scale-105'}`}
-            onClick={() => handleMissionClick(mission)}
-          >
-            <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg">
-              <img
-                src={mission.image}
-                alt={mission.title}
-                className={`w-full h-full object-cover ${mission.isLocked && "filter grayscale brightness-50"}`}
-              />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              
-              {/* Lock overlay for locked missions */}
-              {mission.isLocked && (
-                <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center">
-                  <Lock className="w-12 h-12 text-white/80 mb-2" />
-                  <span className="text-white/80 text-sm font-medium">Complete previous mission to unlock</span>
+    <div className="min-h-screen bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-4 pb-20">
+      <div className="max-w-md mx-auto">
+        <h1 className="text-2xl font-bold text-white mb-4 text-center">Challenges</h1>
+        <div className="space-y-4">
+          {missions.map((mission, index) => (
+            <button
+              key={index}
+              className={`w-full p-0 ${mission.isLocked ? 'cursor-not-allowed' : 'hover:scale-[1.02] transition-transform'}`}
+              onClick={() => handleMissionClick(mission)}
+            >
+              <div className={`bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4 flex items-center space-x-4 ${
+                mission.isLocked ? 'opacity-60' : ''
+              }`}>
+                {/* Exercise Image */}
+                <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-black bg-white flex-shrink-0">
+                  <img
+                    src={mission.image}
+                    alt={mission.title}
+                    className={`w-full h-full object-cover ${mission.isLocked ? "filter grayscale" : ""}`}
+                  />
                 </div>
-              )}
-              
-              {/* Text content */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
-                <h3 className={`text-xl font-bold mb-1 flex items-center gap-2 ${mission.isLocked ? "text-white/60" : "text-white"}`}>
-                  {mission.title}
-                </h3>
-                <p className={`text-sm ${mission.isLocked ? "text-gray-400" : "text-gray-200"}`}>
-                  {mission.description}
-                </p>
-                <p className={`text-sm ${mission.isLocked ? "text-gray-400" : "text-gray-200"}`}>
-                  Pass: {mission.correct}/{mission.maxTurn}
-                </p>
+                
+                {/* Mission Info */}
+                <div className="flex-1 text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-black">{mission.title}</h3>
+                    {mission.isLocked && (
+                      <Lock className="w-4 h-4 text-black/60" />
+                    )}
+                  </div>
+                  <p className="text-black/70 text-sm mb-1">{mission.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-black font-semibold text-sm">
+                      {mission.correct} {mission.title.includes('Squat') ? 'squat' : 'reps'}
+                    </span>
+                    <span className="text-black/70 text-sm">
+                      {mission.title.includes('Squat') ? '30 mins' : '25 mins'}
+                    </span>
+                    <span className="text-black font-semibold text-sm">
+                      {mission.maxTurn * 8} kcal
+                    </span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-black/20 rounded-full h-2 mt-2">
+                    <div 
+                      className={`h-2 rounded-full ${
+                        mission.isLocked ? 'bg-gray-500' : index === 0 ? 'bg-orange-500' : 'bg-gray-400'
+                      }`} 
+                      style={{ width: mission.isLocked ? '0%' : index === 0 ? '80%' : '0%' }}
+                    ></div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </Button>
-        ))}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Mission Selection Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white">
+        <DialogContent className="sm:max-w-[425px] bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl">
           <DialogHeader>
-            <DialogTitle>{selectedMission?.title}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-black text-xl font-bold">{selectedMission?.title}</DialogTitle>
+            <DialogDescription className="text-black/80">
               Choose how you want to proceed with this mission
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <Button 
-              variant="outline" 
+          <div className="grid gap-3 py-4">
+            <button 
               onClick={handleTutorial}
-              className="w-full bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black transition-colors"
             >
               View Tutorial
-            </Button>
-            <Button 
-              variant="outline"
+            </button>
+            <button 
               onClick={handleExercise}
-              className="w-full bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black transition-colors"
             >
               Start Exercise
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>

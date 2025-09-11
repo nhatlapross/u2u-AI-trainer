@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress";
 import NFTSlider from "./nft-slider"
 import { Dumbbell, Flame, Coins, PersonStanding, PackageOpen } from 'lucide-react'
-import KaiaIcon from "@/asset/icon/KaiaIcon"
+import { DollarSign } from 'lucide-react'
 import { useAccount, useBalance, useReadContract } from 'wagmi'
 import { abi } from '@/abi/abi'
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,7 +47,8 @@ export default function ProfilePage() {
   })
 
   useEffect(() => {
-    SetMyBalance(balance?.formatted || 0)
+    const formattedBalance = balance?.formatted ? parseFloat(balance.formatted).toFixed(6) : '0.000000'
+    SetMyBalance(formattedBalance)
   }, [balance])
 
   const { data: nftDetails, isLoading, error } = useReadContract({
@@ -157,67 +158,29 @@ export default function ProfilePage() {
 
   if (!address) {
     return (
-      <div className="container mx-auto p-4 space-y-6 bg-gray-900 text-white">
-        <Card>
-          <CardHeader className="flex flex-row items-center space-x-4">
-            <Skeleton className="w-24 h-24 rounded-full bg-gray-400" />
-            <div className="flex-grow">
-              <Skeleton className="h-6 w-3/4 mb-2 bg-gray-400" />
-              <Skeleton className="h-4 w-1/2 bg-gray-400" />
-            </div>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Fitness Activity</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
+        <div className="max-w-md mx-auto space-y-3">
+          {/* Balance Card */}
+          <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <PersonStanding className="text-blue-500" />
-                <Skeleton className="h-4 w-20 bg-gray-400" />
+                <DollarSign className="w-6 h-6 text-black" />
+                <div>
+                  <h3 className="text-lg font-bold text-black">ETH Balance</h3>
+                  <p className="text-black/70 text-xs">Base Sepolia Testnet</p>
+                </div>
               </div>
-              <Skeleton className="h-4 w-10 bg-gray-400" />
+              <div className="text-xl font-bold text-black">0.00</div>
             </div>
-            <Skeleton className="h-2 w-full bg-gray-400" />
+          </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Flame className="text-red-500" />
-                <Skeleton className="h-4 w-24 bg-gray-400" />
-              </div>
-              <Skeleton className="h-4 w-16 bg-gray-400" />
+          <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-black mb-2">Connect Your Wallet</h2>
+              <p className="text-black/80 text-sm">Please connect your wallet to view your profile</p>
             </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Dumbbell className="text-green-500" />
-                <Skeleton className="h-4 w-28 bg-gray-400" />
-              </div>
-              <Skeleton className="h-4 w-12 bg-gray-400" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>My Assets</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <KaiaIcon />
-                <Skeleton className="h-4 w-16 bg-gray-400" />
-              </div>
-              <Skeleton className="h-4 w-20 bg-gray-400" />
-            </div>
-            <div className="w-full">
-              <Skeleton className="h-4 w-1/2 mb-2 bg-gray-400" />
-              <Skeleton className="h-32 w-full bg-gray-400" />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     )
   }
@@ -225,109 +188,129 @@ export default function ProfilePage() {
   // If address exists but no NFT selected
   if (!isNFTSelected) {
     return (
-      <div className="container mx-auto p-4 space-y-6 bg-gray-900 text-white">
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Your NFT</CardTitle>
-            <CardDescription>Choose an NFT to personalize your fitness profile</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center space-y-4">
-            <PackageOpen className="w-24 h-24 text-gray-500" />
-            <p className="text-center text-muted-foreground">
-              You haven't selected an NFT yet. Browse your collection and choose one to get started!
-            </p>
-            <NFTSlider
-              onNFTUse={handleNFTUse}
-              nftDetails={nftDetails}
-              mockNFT={mockNFT}
-            />
-          </CardContent>
-        </Card>
+      <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
+        <div className="max-w-md mx-auto space-y-3">
+          {/* Balance Card */}
+          <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <DollarSign className="w-6 h-6 text-black" />
+                <div>
+                  <h3 className="text-lg font-bold text-black">ETH Balance</h3>
+                  <p className="text-black/70 text-xs">Base Sepolia Testnet</p>
+                </div>
+              </div>
+              <div className="text-xl font-bold text-black">{myBalance}</div>
+            </div>
+          </div>
+
+          <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+            <div className="text-center mb-3">
+              <h2 className="text-xl font-bold text-black mb-1">Select Your NFT</h2>
+              <p className="text-black/80 text-sm">Choose an NFT to personalize your fitness profile</p>
+            </div>
+            <div className="flex flex-col items-center justify-center space-y-3">
+              <PackageOpen className="w-12 h-12 text-black/60" />
+              <p className="text-center text-black/70 text-sm px-2">
+                You haven't selected an NFT yet. Browse your collection and choose one to get started!
+              </p>
+              <NFTSlider
+                onNFTUse={handleNFTUse}
+                nftDetails={nftDetails}
+                mockNFT={mockNFT}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-6 bg-gray-900 text-white">
-     <Card>
-        <CardHeader className="flex flex-row items-center space-x-4">
-          <Avatar className="w-24 h-24">
-            <AvatarImage
-              src={userStats.tokenUri}
-              alt="User avatar"
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle className="text-2xl">
-              {userStats.name}
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
+      <div className="max-w-md mx-auto space-y-3">
+        {/* Balance Card */}
+        <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <DollarSign className="w-6 h-6 text-black" />
+              <div>
+                <h3 className="text-lg font-bold text-black">ETH Balance</h3>
+                <p className="text-black/70 text-xs">Base Sepolia Testnet</p>
+              </div>
+            </div>
+            <div className="text-xl font-bold text-black">{myBalance}</div>
+          </div>
+        </div>
+
+        {/* Profile Card */}
+        <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-black bg-white flex-shrink-0">
+              <img
+                src={userStats.tokenUri}
+                alt="User avatar"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-black truncate">
+                {userStats.name}
+                {mockNFT && (
+                  <span className="ml-1 text-xs text-orange-600">(Offline)</span>
+                )}
+              </h2>
+              <p className="text-black/80 capitalize text-sm">{userStats.rarity}</p>
               {mockNFT && (
-                <span className="ml-2 text-sm text-yellow-500">(Offline Mode)</span>
+                <p className="text-xs text-black/60 mt-1 leading-tight">NFT will be synced when connection is restored</p>
               )}
-            </CardTitle>
-            <p className="text-muted-foreground">{userStats.rarity}</p>
-            {mockNFT && (
-              <p className="text-xs text-gray-500 mt-1">NFT will be synced when connection is restored</p>
-            )}
-          </div>
-        </CardHeader>
-        {/* <CardContent>
-          <p>Fitness to earn</p>
-        </CardContent> */}
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Fitness Activity</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <PersonStanding className="text-blue-500" />
-              <span>Level</span>
             </div>
-            <span className="font-bold">{userStats.level}</span>
           </div>
-          <Progress value={82} />
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Flame className="text-red-500" />
-              <span>Calories Burned</span>
+        {/* Fitness Activity Card */}
+        <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+          <h3 className="text-lg font-bold text-black mb-3">Fitness Activity</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <PersonStanding className="text-orange-600 w-4 h-4" />
+                <span className="text-black font-medium text-sm">Level</span>
+              </div>
+              <span className="font-bold text-black text-sm">{userStats.level}</span>
             </div>
-            <span className="font-bold">{userStats.points.toString()} kcal</span>
-          </div>
+            <div className="w-full bg-black/20 rounded-full h-2">
+              <div className="bg-orange-600 h-2 rounded-full" style={{width: '82%'}}></div>
+            </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Dumbbell className="text-green-500" />
-              <span>Workouts Completed</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Flame className="text-red-600 w-4 h-4" />
+                <span className="text-black font-medium text-sm">Calories Burned</span>
+              </div>
+              <span className="font-bold text-black text-sm">{userStats.points.toString()} kcal</span>
             </div>
-            <span className="font-bold">{userStats.lastUpdateDay.toString()} days</span>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>My Assets</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <KaiaIcon />
-              <span>KAIA</span>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Dumbbell className="text-green-600 w-4 h-4" />
+                <span className="text-black font-medium text-sm">Workouts Completed</span>
+              </div>
+              <span className="font-bold text-black text-sm">{userStats.lastUpdateDay.toString()} days</span>
             </div>
-            <span className="font-bold">{myBalance}</span>
           </div>
-          <div className="w-full">
-            <h3 className="font-semibold mb-2">NFT Collection</h3>
-            <NFTSlider
-              onNFTUse={handleNFTUse}
-              nftDetails={nftDetails}
-              mockNFT={mockNFT}
-            />
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* NFT Collection Card */}
+        <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+          <h3 className="text-lg font-bold text-black mb-3">NFT Collection</h3>
+          <NFTSlider
+            onNFTUse={handleNFTUse}
+            nftDetails={nftDetails}
+            mockNFT={mockNFT}
+          />
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, memo, useCallback } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import NFTCard from '@/components/MarketPlace/nft-card'
+import NFTItemCard from '@/components/MarketPlace/NFTItemCard'
 import SellNFTModal from '@/components/MarketPlace/sell-nft-modal'
 import BuyNFTModal from '@/components/MarketPlace/buy-nft-modal'
 
+// Move mock data outside component to prevent recreation
 const mockNFTs = [
     { 
         id: '1', 
@@ -88,17 +89,17 @@ export default function NFTMarketplace() {
     const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
     const [activeTab, setActiveTab] = useState('market')
 
-    const handleSellNFT = (nft: NFT) => {
+    const handleSellNFT = useCallback((nft: NFT) => {
         setSelectedNFT(nft)
         setIsSellModalOpen(true)
-    }
+    }, [])
 
-    const handleBuyNFT = (nft: NFT) => {
+    const handleBuyNFT = useCallback((nft: NFT) => {
         setSelectedNFT(nft)
         setIsBuyModalOpen(true)
-    }
+    }, [])
 
-    const handleSetPrice = (price: number) => {
+    const handleSetPrice = useCallback((price: number) => {
         if (selectedNFT) {
             const updatedNFTs = nfts.map((nft) =>
                 nft.id === selectedNFT.id ? { ...nft, price, owner: '0xMarket' } : nft
@@ -106,9 +107,9 @@ export default function NFTMarketplace() {
             setNfts(updatedNFTs)
             setIsSellModalOpen(false)
         }
-    }
+    }, [selectedNFT, nfts])
 
-    const handleBuy = () => {
+    const handleBuy = useCallback(() => {
         if (selectedNFT) {
             const updatedNFTs = nfts.map((nft: NFT) =>
                 nft.id === selectedNFT.id ? { ...nft, price: null, owner: '0x1234...5678' } : nft
@@ -116,71 +117,80 @@ export default function NFTMarketplace() {
             setNfts(updatedNFTs)
             setIsBuyModalOpen(false)
         }
-    }
+    }, [selectedNFT, nfts])
 
-    const marketNFTs = nfts.filter((nft) => nft.owner === '0xMarket')
-    const myNFTs = nfts.filter((nft) => nft.owner === '0x1234...5678')
+    const marketNFTs = useMemo(() => nfts.filter((nft) => nft.owner === '0xMarket'), [nfts])
+    const myNFTs = useMemo(() => nfts.filter((nft) => nft.owner === '0x1234...5678'), [nfts])
 
     return (
-        <div className="bg-gray-900 min-h-screen p-8">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid grid-cols-2 bg-transparent border-gray-700">
-                    <TabsTrigger
-                        value="market"
-                        className={`
-                                px-6 py-3 text-sm font-medium uppercase tracking-wider transition-all duration-300 ease-in-out
+        <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
+            <div className="max-w-md mx-auto space-y-3">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    <TabsList className="grid grid-cols-2 bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-3 my-4 w-full gap-2 h-14">
+                        <TabsTrigger
+                            value="market"
+                            className={`
+                                px-3 py-3 text-sm font-bold rounded-xl transition-all duration-200 flex-1 min-w-0
                                 ${activeTab === 'market'
-                                ? 'text-white border-b-2 border-blue-500'
-                                : 'text-gray-400 hover:text-gray-200 border-b-2 border-transparent hover:border-gray-600'}
+                                    ? 'bg-orange-500 text-white border-t-2 border-l-2 border-r-4 border-b-4 border-black shadow-md'
+                                    : 'text-black hover:bg-yellow-300'}
                             `}
-                    >
-                        Market
-                    </TabsTrigger>
-                    <TabsTrigger
-                        value="my-nfts"
-                        className={`
-                                px-6 py-3 text-sm font-medium uppercase tracking-wider transition-all duration-300 ease-in-out
+                        >
+                            <span className="truncate">Market</span>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="my-nfts"
+                            className={`
+                                px-3 py-3 text-sm font-bold rounded-xl transition-all duration-200 flex-1 min-w-0
                                 ${activeTab === 'my-nfts'
-                                ? 'text-white border-b-2 border-blue-500'
-                                : 'text-gray-400 hover:text-gray-200 border-b-2 border-transparent hover:border-gray-600'}
+                                    ? 'bg-orange-500 text-white border-t-2 border-l-2 border-r-4 border-b-4 border-black shadow-md'
+                                    : 'text-black hover:bg-yellow-300'}
                             `}
-                    >
-                        My NFTs
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="market" className="pt-6">
-                    <div className="min-h-screen bg-gray-900 flex items-center justify-center py-16">
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {marketNFTs.map((nft) => (
-                                <NFTCard
-                                    key={nft.id}
-                                    nft={nft}
-                                    onSell={() => { }}
-                                    onBuy={() => handleBuyNFT(nft)}
-                                    isOwner={false}
-                                    showSellButton={false}
-                                />
-                            ))}
+                        >
+                            <span className="truncate">My NFTs</span>
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="market" className="pt-3">
+                        <div className="space-y-3">
+                            {marketNFTs.length === 0 ? (
+                                <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-8 text-center">
+                                    <div className="text-6xl mb-4">🏪</div>
+                                    <h3 className="text-xl font-bold text-black mb-2">No NFTs for Sale</h3>
+                                    <p className="text-black/70 text-sm">Check back later for new listings!</p>
+                                </div>
+                            ) : (
+                                marketNFTs.map((nft) => (
+                                    <NFTItemCard
+                                        key={nft.id}
+                                        nft={nft}
+                                        onBuy={handleBuyNFT}
+                                        isMarket={true}
+                                    />
+                                ))
+                            )}
                         </div>
-                    </div>
-                </TabsContent>
-                <TabsContent value="my-nfts" className="pt-6">
-                    <div className="min-h-screen bg-gray-900 flex items-center justify-center py-16">
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {myNFTs.map((nft) => (
-                                <NFTCard
-                                    key={nft.id}
-                                    nft={nft}
-                                    onSell={() => handleSellNFT(nft)}
-                                    onBuy={() => { }}
-                                    isOwner={true}
-                                    showSellButton={true}
-                                />
-                            ))}
+                    </TabsContent>
+                    <TabsContent value="my-nfts" className="pt-3">
+                        <div className="space-y-3">
+                            {myNFTs.length === 0 ? (
+                                <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-8 text-center">
+                                    <div className="text-6xl mb-4">💎</div>
+                                    <h3 className="text-xl font-bold text-black mb-2">No NFTs Owned</h3>
+                                    <p className="text-black/70 text-sm">Mint your first NFT to get started!</p>
+                                </div>
+                            ) : (
+                                myNFTs.map((nft) => (
+                                    <NFTItemCard
+                                        key={nft.id}
+                                        nft={nft}
+                                        onSell={handleSellNFT}
+                                        isMarket={false}
+                                    />
+                                ))
+                            )}
                         </div>
-                    </div>
-                </TabsContent>
-            </Tabs>
+                    </TabsContent>
+                </Tabs>
 
 
             {selectedNFT && (
@@ -199,6 +209,7 @@ export default function NFTMarketplace() {
                     />
                 </>
             )}
+            </div>
         </div>
     )
 }

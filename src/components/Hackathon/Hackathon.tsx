@@ -23,37 +23,37 @@ const FitnessHackathonSlider = () => {
     };
 
     return (
-        <div className="w-full h-full">
-            <div className="bg-gray-900 p-4">
+        <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
+            <div className="max-w-md mx-auto space-y-3">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid grid-cols-2 bg-transparent border-gray-700">
+                    <TabsList className="grid grid-cols-2 bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-3 my-4 w-full gap-2 h-14">
                         <TabsTrigger
                             value="market"
                             className={`
-                            px-6 py-3 text-sm font-medium uppercase tracking-wider transition-all duration-300 ease-in-out
-                            ${activeTab === 'market'
-                                    ? 'text-white border-b-2 border-blue-500'
-                                    : 'text-gray-400 hover:text-gray-200 border-b-2 border-transparent hover:border-gray-600'}
-                        `}
+                                px-3 py-3 text-sm font-bold rounded-xl transition-all duration-200 flex-1 min-w-0
+                                ${activeTab === 'market'
+                                    ? 'bg-orange-500 text-white border-t-2 border-l-2 border-r-4 border-b-4 border-black shadow-md'
+                                    : 'text-black hover:bg-yellow-300'}
+                            `}
                         >
-                            All Hackathon
+                            <span className="truncate">All Hackathon</span>
                         </TabsTrigger>
                         <TabsTrigger
                             value="my-nfts"
                             className={`
-                            px-6 py-3 text-sm font-medium uppercase tracking-wider transition-all duration-300 ease-in-out
-                            ${activeTab === 'my-nfts'
-                                    ? 'text-white border-b-2 border-blue-500'
-                                    : 'text-gray-400 hover:text-gray-200 border-b-2 border-transparent hover:border-gray-600'}
-                        `}
+                                px-3 py-3 text-sm font-bold rounded-xl transition-all duration-200 flex-1 min-w-0
+                                ${activeTab === 'my-nfts'
+                                    ? 'bg-orange-500 text-white border-t-2 border-l-2 border-r-4 border-b-4 border-black shadow-md'
+                                    : 'text-black hover:bg-yellow-300'}
+                            `}
                         >
-                            My Hackathon
+                            <span className="truncate">My Hackathon</span>
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="market" className="pt-6">
+                    <TabsContent value="market" className="pt-3">
                         <AllHackathon onJoinHackathon={handleJoinHackathon} />
                     </TabsContent>
-                    <TabsContent value="my-nfts" className="pt-6">
+                    <TabsContent value="my-nfts" className="pt-3">
                         <MyHackathon myNFTs={myNFTs} />
                     </TabsContent>
                 </Tabs>

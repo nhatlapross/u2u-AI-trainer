@@ -1,17 +1,19 @@
 "use client"
-import React, { useEffect } from 'react';
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { LoadingAnimation } from "@/components/MintNFT/loading-animation"
-import { ConfettiEffect } from "@/components/MintNFT/confetti-effect"
+import React, { useEffect, useState, useMemo } from 'react';
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useAccount, useWriteContract } from 'wagmi'
 import { abi } from '@/abi/abi'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { toast } from 'react-hot-toast'
+
+import { motion } from 'framer-motion'
+
+// Lazy load heavy components that are used conditionally
+const ConfettiEffect = dynamic(() => import("@/components/MintNFT/confetti-effect").then(mod => ({ default: mod.ConfettiEffect })), {
+  ssr: false
+})
 
 interface AvatarImage {
   url: string;
@@ -26,11 +28,13 @@ export default function MintNFTPage() {
   const [mintedNFT, setMintedNFT] = useState<AvatarImage | null>(null)
   const [avatarURL, setAvatarURL] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [showMintForm, setShowMintForm] = useState(true)
   const { address } = useAccount();
   const { data: hash, writeContract } = useWriteContract()
+  const router = useRouter();
 
-  // Array of avatar image paths
-  const avatarImages: AvatarImage[] = [
+  // Memoized array of avatar image paths to prevent re-creation on each render
+  const avatarImages: AvatarImage[] = useMemo(() => [
     { url: '/avatar/bear1.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmcxerZCr21F1zN97NifdYfJjpNay8vpf17wkt9E2a3Ngo", rarity: 'common' },
     { url: '/avatar/bear2.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmNWTAK5M3GRx8R94NXsJA1n15GzkcrbmUA3t3gJyotNAw", rarity: 'rare' },
     { url: '/avatar/buffalo1.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmPfxSoDiwQX3Kb6UyEahKdP3UnyqHB6bcgrDJrY61v67X", rarity: 'uncommon' },
@@ -43,7 +47,7 @@ export default function MintNFTPage() {
     { url: '/avatar/pig2.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmQybyAYpUHVjzTzAXJoJUm7MW7BdreDUims9Kmih2G4Lm", rarity: 'rare' },
     { url: '/avatar/tiger1.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmbnW2fdYPSiRAGSNu8JBUCJHjmy5rxSALmFEVQMwNSAWU", rarity: 'legendary' },
     { url: '/avatar/tiger2.png', link: "https://statutory-plum-seahorse.myfilebase.com/ipfs/QmcW93pTwXTRwjnnGF62ybNZuZnkFvpDLy1A9PPkZBcJ8p", rarity: 'legendary' },
-  ];
+  ], []);
 
 
   const handleMint = async (e: React.FormEvent) => {
@@ -57,7 +61,6 @@ export default function MintNFTPage() {
 
     // Update the state with the selected avatar
     setMintedNFT(randomImage);
-    console.log(mintedNFT);
     
     try {
       await writeContract({
@@ -68,9 +71,28 @@ export default function MintNFTPage() {
       });
     } catch (error) {
       console.error('Minting failed:', error);
-      console.log('Using mock data for testing');
+      setIsMinting(false);
       
-      // Mock data when mint fails - allow user to continue playing
+      // Check if user rejected the transaction
+      if (error instanceof Error) {
+        if (error.message.includes('User rejected') || error.message.includes('user rejected')) {
+          toast.error('Transaction was cancelled by user');
+          return;
+        }
+        
+        if (error.message.includes('insufficient funds')) {
+          toast.error('Insufficient funds for transaction');
+          return;
+        }
+        
+        // Generic error
+        toast.error('Minting failed: ' + error.message);
+      } else {
+        toast.error('An unexpected error occurred during minting');
+      }
+      
+      // Fallback to mock data for testing/offline mode
+      console.log('Using mock data for testing');
       setTimeout(() => {
         // Save mock NFT data to localStorage
         const mockNFT = {
@@ -87,20 +109,18 @@ export default function MintNFTPage() {
         
         // Set state to show success UI
         setAvatarURL(randomImage.url);
-        setIsMinting(false);
+        setShowMintForm(false);
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
         
-        // Show notification that it's mock data
-        alert('Note: Using offline mode. Your NFT will be minted when connection is restored.');
-      }, 2000); // Simulate minting delay
+        toast.success('Demo NFT created! (Offline mode)');
+      }, 1000);
     }
   };
 
   useEffect(() => {
     if (hash != null && isMinting && mintedNFT) {
-      // Select a random image
-      console.log(hash);
+      console.log('NFT minted successfully:', hash);
       
       // Save real NFT data to localStorage
       const realNFT = {
@@ -118,121 +138,156 @@ export default function MintNFTPage() {
       
       setAvatarURL(mintedNFT.url);
       setIsMinting(false);
+      setShowMintForm(false);
 
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 5000);
+      
+      toast.success(`NFT "${nftName}" minted successfully!`);
     }
   }, [hash, isMinting, mintedNFT, nftName]);
 
-  const rarityColors: Record<AvatarImage['rarity'], string> = {
+  const rarityColors: Record<AvatarImage['rarity'], string> = useMemo(() => ({
     common: "bg-gray-400 text-black",
     uncommon: "bg-green-400 text-black",
     rare: "bg-blue-400 text-white",
     epic: "bg-purple-500 text-white",
     legendary: "bg-yellow-400 text-black",
+  }), []);
+
+  const handleRetry = () => {
+    setShowMintForm(true);
+    setAvatarURL(null);
+    setMintedNFT(null);
+    setNftName('');
+    setShowConfetti(false);
   };
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center p-2">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Mint Your NFT</CardTitle>
-          <CardDescription>Enter a name for your new NFT and click mint!</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleMint}>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="nftName">NFT Name</Label>
-                <Input
-                  id="nftName"
-                  placeholder="Enter NFT name"
-                  value={nftName}
-                  onChange={(e) => setNftName(e.target.value)}
-                  required
-                />
+    <>
+      {/* Fullscreen Loading */}
+      {isMinting && (
+        <div className="fixed inset-0 bg-yellow-400 z-50 flex items-center justify-center">
+          <div className="text-center">
+            <Image
+              src="/loading.gif"
+              alt="Minting NFT..."
+              width={400}
+              height={300}
+              className="mx-auto"
+              unoptimized
+            />
+            <h2 className="text-3xl font-bold text-black mt-4">Minting Your NFT...</h2>
+            <p className="text-black/80 text-lg">Please wait while we create your unique NFT</p>
+          </div>
+        </div>
+      )}
+
+      <div className="min-h-screen bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-6 shadow-lg">
+          
+          {/* Mint Form */}
+          {showMintForm && (
+            <>
+              <div className="text-center mb-6">
+                <h1 className="text-3xl font-bold text-black mb-2">Mint Your NFT</h1>
+                <p className="text-black/80">Enter a name for your new NFT and click mint!</p>
               </div>
-              {/* <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="nftName">NFT description</Label>
-                <Input
-                  id="nftDescription"
-                  placeholder="Enter NFT description"
-                  value={nftDescription}
-                  onChange={(e) => setNftDescription(e.target.value)}
-                  required
-                />
-              </div> */}
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col items-center space-y-4">
-          <Button
-            type="submit"
-            onClick={handleMint}
-            disabled={isMinting || !nftName.trim()}
-            className="w-full"
-          >
-            {isMinting ? (
-              <motion.div
-                className="flex items-center justify-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <LoadingAnimation />
-                <span className="ml-2">Minting...</span>
-              </motion.div>
-            ) : (
-              'Mint NFT'
-            )}
-          </Button>
-          <AnimatePresence>
-            {avatarURL && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="text-center"
-              >
-                <h3 className="text-xl font-bold mb-2">Congratulations!</h3>
-                <p className="mb-4">Your NFT "{nftName}" has been minted successfully!</p>
-                <div className="relative w-48 h-48 mx-auto border-4 border-white rounded-lg overflow-hidden">
-                  <Image
-                    src={mintedNFT?.url || ''}
-                    alt={`Minted NFT: ${nftName}`}
-                    layout="fill"
-                    objectFit="cover"
+              
+              <form onSubmit={handleMint} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="nftName" className="text-sm font-semibold text-black">
+                    NFT Name
+                  </label>
+                  <input
+                    id="nftName"
+                    type="text"
+                    placeholder="Enter NFT name"
+                    value={nftName}
+                    onChange={(e) => setNftName(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 bg-white border-2 border-black rounded-xl text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
-                  {/* Rarity Badge */}
-                  {mintedNFT && (
-                    <div
-                      className={`absolute top-2 right-2 px-2 py-1 rounded-lg ${rarityColors[mintedNFT.rarity] || "bg-black text-white"
-                        }`}
-                    >
-                      {mintedNFT.rarity.toUpperCase()}
-                    </div>
-                  )}
                 </div>
-              </motion.div>
-            )}
-            {((hash != null || avatarURL != null) && mintedNFT != null) && (
-              <div className="mt-4 flex justify-center">
-                <Link
-                  href={`https://kairos.kaiascan.io/tx/${hash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                
+                <button
+                  type="submit"
+                  disabled={isMinting || !nftName.trim()}
+                  className={`w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-200 ${
+                    isMinting || !nftName.trim()
+                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed border-2 border-gray-500'
+                      : 'bg-orange-500 text-white hover:bg-orange-600 border-t-2 border-l-2 border-r-4 border-b-4 border-black shadow-lg hover:shadow-xl active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2'
+                  }`}
                 >
-                  <Button variant="outline" className="mx-auto">
-                    View in Explorer
-                  </Button>
-                </Link>
+                  {isMinting ? 'Minting...' : 'Mint NFT'}
+                </button>
+              </form>
+            </>
+          )}
+        
+          {/* NFT Result */}
+          {avatarURL && !showMintForm && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="text-center"
+            >
+              <h3 className="text-2xl font-bold mb-2 text-black">Congratulations!</h3>
+              <p className="mb-4 text-black/80">Your NFT "{nftName}" has been minted successfully!</p>
+              <div className="relative w-48 h-48 mx-auto border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl overflow-hidden bg-white mb-4">
+                <Image
+                  src={mintedNFT?.url || ''}
+                  alt={`Minted NFT: ${nftName}`}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+                {/* Rarity Badge */}
+                {mintedNFT && (
+                  <div
+                    className={`absolute top-2 right-2 px-3 py-1 rounded-xl font-bold text-sm border-2 border-black ${
+                      rarityColors[mintedNFT.rarity] || "bg-black text-white"
+                    }`}
+                  >
+                    {mintedNFT.rarity.toUpperCase()}
+                  </div>
+                )}
               </div>
-            )}
-          </AnimatePresence>
-        </CardFooter>
-      </Card>
+              
+              <div className="space-y-3">
+                {((hash != null || avatarURL != null) && mintedNFT != null) && (
+                  <Link
+                    href={`https://sepolia.basescan.org/tx/${hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <button className="w-full bg-black text-yellow-400 hover:bg-gray-800 font-semibold py-3 px-4 rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black transition-all duration-200 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2">
+                      View in Explorer
+                    </button>
+                  </Link>
+                )}
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => router.push('/profile')}
+                    className="bg-green-500 text-white hover:bg-green-600 font-bold py-3 px-4 rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black shadow-lg transition-all duration-200 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2"
+                  >
+                    Go to Profile
+                  </button>
+                  
+                  <button
+                    onClick={handleRetry}
+                    className="bg-orange-500 text-white hover:bg-orange-600 font-bold py-3 px-4 rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black shadow-lg transition-all duration-200 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2"
+                  >
+                    Mint Another
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+      </div>
       {showConfetti && <ConfettiEffect />}
     </div>
+    </>
   )
 }

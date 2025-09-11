@@ -59,104 +59,67 @@ export default function MyHackathon({ myNFTs }: { myNFTs: any[] }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center py-16">
+        <div className="space-y-3">
             {myNFTs.length === 0 ? (
-                <div className="text-center text-gray-400">
-                    <p>No Hackathon NFTs yet. Join a hackathon to get started!</p>
+                <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-8 text-center">
+                    <div className="text-6xl mb-4">🏆</div>
+                    <h3 className="text-xl font-bold text-black mb-2">No Hackathon NFTs Yet</h3>
+                    <p className="text-black/70 text-sm">Join a hackathon from the All Hackathon tab to get started!</p>
                 </div>
             ) : (
-                <Swiper
-                    effect={'coverflow'}
-                    loop={true}
-                    grabCursor={true}
-                    centeredSlides={true}
-                    spaceBetween={30}
-                    breakpoints={{
-                        320: {
-                            slidesPerView: 1,
-                            coverflowEffect: {
-                                rotate: 30,
-                                stretch: 0,
-                                depth: 50,
-                                modifier: 1,
-                                slideShadows: false,
-                            }
-                        },
-                        768: {
-                            slidesPerView: 2,
-                            coverflowEffect: {
-                                rotate: 40,
-                                stretch: 0,
-                                depth: 75,
-                                modifier: 1,
-                                slideShadows: true,
-                            }
-                        },
-                        1024: {
-                            slidesPerView: 3,
-                            coverflowEffect: {
-                                rotate: 50,
-                                stretch: 0,
-                                depth: 100,
-                                modifier: 1,
-                                slideShadows: true,
-                            }
-                        }
-                    }}
-                    pagination={{
-                        clickable: true,
-                    }}
-                    modules={[EffectCoverflow, Pagination]}
-                    className="w-full max-w-[1100px] h-[500px] px-4"
-                >
-                    {myNFTs.map((nft) => (
-                        <SwiperSlide key={nft.nftId} className="flex items-center justify-center">
-                            <div className="bg-gray-800 shadow-2xl rounded-lg overflow-hidden w-full max-w-sm">
+                myNFTs.map((nft) => (
+                    <div key={nft.nftId} className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
+                        <div className="flex space-x-4">
+                            {/* Image */}
+                            <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-black bg-white flex-shrink-0">
                                 <img
                                     src={nft.image}
                                     alt={nft.name}
-                                    className="w-full h-64 object-cover"
+                                    className="w-full h-full object-cover"
                                 />
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold mb-2 text-white">{nft.name}</h2>
-
-                                    <div className="grid grid-cols-1 gap-2 mb-4 text-gray-300">
-
-                                        <div className="flex justify-between text-sm">
-                                            <p className="text-sm text-gray-500">Type</p>
-                                            <p className="font-medium">{nft.type}</p>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-400">Dates:</span>
-                                            <span className="text-gray-200">{new Date(nft.startDate).toLocaleDateString()} - {new Date(nft.endDate).toLocaleDateString()}</span>
-                                        </div>
-
-
-                                        <div className="flex justify-between text-sm">
-                                            <p className="text-sm text-gray-500">Participants</p>
-                                            <p className="font-medium">
-                                                {nft.participants}/{nft.maxParticipants}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex justify-between text-sm">
-                                            <p className="text-sm text-gray-500">Price</p>
-                                            <p className="font-medium">${nft.price}</p>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={() => handleClaim(nft)}
-                                        disabled={true}
-                                        className={`w-full py-2 rounded-lg transition bg-gray-600 text-white`}
-                                    >
-                                        Claim
-                                    </button>
-                                </div>
                             </div>
-                        </SwiperSlide>
-                    ))};
-                </Swiper>
+                            
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-lg font-bold text-black truncate">
+                                        {nft.name}
+                                    </h3>
+                                    <div className="bg-green-500 border border-black text-white px-2 py-1 rounded-lg text-xs font-bold">
+                                        OWNED
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-1 mb-3">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-black/70">Type:</span>
+                                        <span className="font-medium text-black capitalize">{nft.type}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-black/70">NFT ID:</span>
+                                        <span className="font-mono text-black text-xs">{nft.nftId}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-black/70">Claimed:</span>
+                                        <span className="font-medium text-black text-xs">{nft.claimedAt}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-black/70">Value:</span>
+                                        <span className="font-bold text-green-600">${nft.price}</span>
+                                    </div>
+                                </div>
+                                
+                                {/* Claim Button */}
+                                <button
+                                    onClick={() => handleClaim(nft)}
+                                    className="w-full bg-orange-500 border-t-2 border-l-2 border-r-4 border-b-4 border-black text-white font-bold py-2 px-4 rounded-xl hover:bg-orange-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2 transition-all duration-200"
+                                >
+                                    Claim Rewards
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))
             )}
         </div>
     )
