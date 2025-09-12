@@ -176,7 +176,7 @@ export default function NFTSlider({ onNFTUse, nftDetails, mockNFT }: NFTSliderPr
 
   return (
     <>
-      <Carousel className="w-full max-w-xs mx-auto">
+      <Carousel className="w-full max-w-xs mx-auto relative">
         <CarouselContent>
           {nfts.map((nft) => (
             <CarouselItem key={nft.tokenId}>
@@ -184,121 +184,139 @@ export default function NFTSlider({ onNFTUse, nftDetails, mockNFT }: NFTSliderPr
                 <CardContent 
                   className={`
                     flex aspect-square items-center justify-center p-6 relative 
-                    hover:bg-gray-800 cursor-pointer
+                    cursor-pointer
                     transition-colors duration-200
                     ${nft.isUsing ? "border-2 border-green-500" : ""}
                     ${nft.isSelling ? "opacity-50" : ""}
                   `}
                   onClick={() => handleNFTClick(nft)}
                 >
-                  <div className="text-center">
-                    <div className="relative">
-                      <Image
-                        src={nft.tokenUri}
-                        alt={nft.name}
-                        width={150}
-                        height={150}
-                        className="mx-auto mb-2 rounded-lg"
-                      />
-                      {nft.isUsing && (
-                        <Badge 
-                          variant="default" 
-                          className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4"
-                        >
-                          Using
-                        </Badge>
-                      )}
-                      {nft.isSelling && (
-                        <Badge 
-                          variant="destructive" 
-                          className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4"
-                        >
-                          Selling
-                        </Badge>
-                      )}
-                      {nft.isMock && (
-                        <Badge 
-                          variant="outline" 
-                          className="absolute bottom-0 left-0 bg-yellow-500/20 text-yellow-500 border-yellow-500"
-                        >
-                          Offline
-                        </Badge>
-                      )}
-                    </div>
-                    <h4 className="font-semibold">{nft.name}</h4>
-                    {nft.isSelling && (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-2"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          // Implement cancel sell logic
-                        }}
+                <div className="text-center">
+                  <div className="relative">
+                    <Image
+                      src={nft.tokenUri}
+                      alt={nft.name}
+                      width={150}
+                      height={150}
+                      className="mx-auto mb-2 rounded-lg"
+                    />
+                    {nft.isUsing && (
+                      <Badge 
+                        variant="default" 
+                        className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4"
                       >
-                        Cancel Sell
-                      </Button>
+                        Using
+                      </Badge>
+                    )}
+                    {nft.isSelling && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4"
+                      >
+                        Selling
+                      </Badge>
+                    )}
+                    {nft.isMock && (
+                      <Badge 
+                        variant="outline" 
+                        className="absolute bottom-0 left-0 bg-yellow-500/20 text-yellow-500 border-yellow-500"
+                      >
+                        Offline
+                      </Badge>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-          ))}
+                  <h4 className="font-semibold">{nft.name}</h4>
+                  {nft.isSelling && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        // Implement cancel sell logic
+                      }}
+                    >
+                      Cancel Sell
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </CarouselItem>
+        ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black hover:bg-yellow-500 text-black w-8 h-8" />
+        <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black hover:bg-yellow-500 text-black w-8 h-8" />
       </Carousel>
 
       {selectedNFT && !selectedNFT.isSelling && (
         <Dialog open={!!selectedNFT} onOpenChange={handleCloseModal}>
-          <DialogContent className="sm:max-w-[425px] bg-gray-800 text-white">
+          <DialogContent className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl text-black max-w-sm">
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="text-2xl font-bold text-black text-center mb-4">
                 {selectedNFT.name}
                 {selectedNFT.isMock && (
-                  <span className="ml-2 text-sm text-yellow-500">(Offline Mode)</span>
+                  <span className="ml-2 text-sm text-orange-600">(Offline Mode)</span>
                 )}
               </DialogTitle>
-              <DialogDescription>
-                {selectedNFT.isMock 
-                  ? "This is a mock NFT for offline testing" 
-                  : "NFT Details"}
-              </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
+            <div className="py-6 text-center">
+              <div className="mb-6">
                 <Image
                   src={selectedNFT.tokenUri}
                   alt={selectedNFT.name}
-                  width={100}
-                  height={100}
-                  className="col-span-2 mx-auto rounded-lg"
+                  width={120}
+                  height={120}
+                  className="mx-auto rounded-xl border-2 border-black object-cover"
                 />
-                <div className="col-span-2 space-y-2">
-                  <p><strong>Token ID:</strong> {selectedNFT.tokenId.toString()}</p>
-                  <p><strong>Level:</strong> {selectedNFT.level.toString()}</p>
-                  <p><strong>Last Update:</strong> {selectedNFT.lastUpdateDay.toString()}</p>
-                  <p><strong>Points:</strong> {selectedNFT.points.toString()}</p>
-                  <p><strong>Rarity:</strong> {selectedNFT.rarity}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 mb-6 text-left">
+                <div className="bg-white/20 p-3 rounded-lg border-2 border-black">
+                  <p className="text-xs font-semibold text-black/60 uppercase">Token ID</p>
+                  <p className="font-bold text-black">{selectedNFT.tokenId.toString()}</p>
+                </div>
+                <div className="bg-white/20 p-3 rounded-lg border-2 border-black">
+                  <p className="text-xs font-semibold text-black/60 uppercase">Level</p>
+                  <p className="font-bold text-black">{selectedNFT.level.toString()}</p>
+                </div>
+                <div className="bg-white/20 p-3 rounded-lg border-2 border-black">
+                  <p className="text-xs font-semibold text-black/60 uppercase">Points</p>
+                  <p className="font-bold text-black">{selectedNFT.points.toString()}</p>
+                </div>
+                <div className="bg-white/20 p-3 rounded-lg border-2 border-black">
+                  <p className="text-xs font-semibold text-black/60 uppercase">Rarity</p>
+                  <p className="font-bold text-black capitalize">{selectedNFT.rarity}</p>
                 </div>
               </div>
-              <div className="flex justify-between space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={handleUseNFT}
-                  className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
-                >
-                  {selectedNFT.isUsing ? "Unuse NFT" : "Use NFT"}
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={() => redeemPoint()}
-                  disabled={isMinting || selectedNFT.isMock}
-                  className="w-full hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
-                >
-                  {isMinting ? "Redeeming..." : "Redeem"}
-                </Button>
-              </div>
+
+              {isMinting ? (
+                <div className="text-center mb-4">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-black border-t-transparent mb-4"></div>
+                  <p className="text-black/80 text-lg font-semibold">Processing Transaction...</p>
+                  <p className="text-black/60 text-sm">Please wait while we redeem your points</p>
+                </div>
+              ) : (
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={handleUseNFT}
+                    className="px-6 py-3 bg-blue-500 text-white font-bold rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black hover:bg-blue-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2 transition-all duration-200"
+                  >
+                    {selectedNFT.isUsing ? "Unuse NFT" : "Use NFT"}
+                  </button>
+                  <button
+                    onClick={() => redeemPoint()}
+                    disabled={selectedNFT.isMock}
+                    className={`px-6 py-3 font-bold rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black transition-all duration-200 ${
+                      selectedNFT.isMock 
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                        : 'bg-green-500 text-white hover:bg-green-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2'
+                    }`}
+                  >
+                    Redeem
+                  </button>
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
