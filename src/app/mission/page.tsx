@@ -1,13 +1,24 @@
 'use client';
 
-import React from "react";
-import MissionCards from "@/components/ListNFT/MissionCards";
+import React, { lazy, Suspense } from "react";
+
+// Lazy load MissionCards to improve initial loading performance
+const MissionCards = lazy(() => import("@/components/ListNFT/MissionCards"));
 
 const NFTMissionsPage = () => {
   return (
     <div className="bg-gray-900 min-h-screen text-white flex items-center justify-center">
       <div className="w-full">
-        <MissionCards />
+        <Suspense fallback={
+          <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+              <p className="text-orange-500">Loading Missions...</p>
+            </div>
+          </div>
+        }>
+          <MissionCards />
+        </Suspense>
       </div>
     </div>
   )

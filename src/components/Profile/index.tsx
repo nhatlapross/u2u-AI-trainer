@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress";
-import NFTSlider from "./nft-slider"
-import { Dumbbell, Flame, Coins, PersonStanding, PackageOpen } from 'lucide-react'
-import { DollarSign } from 'lucide-react'
+import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from "react"
+import { Dumbbell, Flame, PersonStanding, PackageOpen, DollarSign } from 'lucide-react'
 import { useAccount, useBalance, useReadContract } from 'wagmi'
 import { abi } from '@/abi/abi'
-import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy load NFTSlider to improve initial loading
+const NFTSlider = lazy(() => import('./nft-slider'))
 
 // Default fallback profile in case no NFT details are available
 const defaultProfile = {
@@ -43,13 +40,21 @@ export default function ProfilePage() {
   const { address } = useAccount()
 
   const { data: balance } = useBalance({
-    address: address
+    address: address,
+    query: {
+      enabled: !!address,
+      staleTime: 30000,
+      gcTime: 300000,
+    }
   })
 
+  const formattedBalance = useMemo(() => {
+    return balance?.formatted ? parseFloat(balance.formatted).toFixed(6) : '0.000000'
+  }, [balance?.formatted])
+
   useEffect(() => {
-    const formattedBalance = balance?.formatted ? parseFloat(balance.formatted).toFixed(6) : '0.000000'
     SetMyBalance(formattedBalance)
-  }, [balance])
+  }, [formattedBalance])
 
   const { data: nftDetails, isLoading, error } = useReadContract({
     abi: abi,
@@ -57,11 +62,14 @@ export default function ProfilePage() {
     functionName: 'getNFTDetailsByAddress',
     args: [address],
     query: {
-      enabled: !!address
+      enabled: !!address,
+      staleTime: 60000,
+      gcTime: 300000,
+      retry: 2,
     }
   })
 
-  const handleNFTUse = (nft: any) => {
+  const handleNFTUse = useCallback((nft: any) => {
     if (nft) {
       setUserStats({
         name: nft.name.toString() || '',
@@ -88,7 +96,7 @@ export default function ProfilePage() {
       })
       setIsNFTSelected(false)
     }
-  }
+  }, [])
 
   // Check for mock NFT from localStorage
   useEffect(() => {
@@ -159,7 +167,7 @@ export default function ProfilePage() {
   if (!address) {
     return (
       <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
-        <div className="max-w-md mx-auto space-y-3">
+        <div className="w-full space-y-3">
           {/* Balance Card */}
           <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
             <div className="flex items-center justify-between">
@@ -189,7 +197,7 @@ export default function ProfilePage() {
   if (!isNFTSelected) {
     return (
       <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
-        <div className="max-w-md mx-auto space-y-3">
+        <div className="w-full space-y-3">
           {/* Balance Card */}
           <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
             <div className="flex items-center justify-between">
@@ -214,11 +222,13 @@ export default function ProfilePage() {
               <p className="text-center text-black/70 text-sm px-2">
                 You haven't selected an NFT yet. Browse your collection and choose one to get started!
               </p>
-              <NFTSlider
-                onNFTUse={handleNFTUse}
-                nftDetails={nftDetails}
-                mockNFT={mockNFT}
-              />
+              <Suspense fallback={<div className="flex items-center justify-center p-4 text-black/60">Loading NFTs...</div>}>
+                <NFTSlider
+                  onNFTUse={handleNFTUse}
+                  nftDetails={nftDetails}
+                  mockNFT={mockNFT}
+                />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -304,11 +314,13 @@ export default function ProfilePage() {
         {/* NFT Collection Card */}
         <div className="bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-4">
           <h3 className="text-lg font-bold text-black mb-3">NFT Collection</h3>
-          <NFTSlider
-            onNFTUse={handleNFTUse}
-            nftDetails={nftDetails}
-            mockNFT={mockNFT}
-          />
+          <Suspense fallback={<div className="flex items-center justify-center p-4 text-black/60">Loading NFTs...</div>}>
+            <NFTSlider
+              onNFTUse={handleNFTUse}
+              nftDetails={nftDetails}
+              mockNFT={mockNFT}
+            />
+          </Suspense>
         </div>
       </div>
     </div>
