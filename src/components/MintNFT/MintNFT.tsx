@@ -257,7 +257,7 @@ export default function MintNFTPage() {
               <div className="space-y-3">
                 {((hash != null || avatarURL != null) && mintedNFT != null) && (
                   <Link
-                    href={`https://sepolia.basescan.org/tx/${hash}`}
+                    href={`${process.env.NEXT_PUBLIC_SCAN_URL}/${hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

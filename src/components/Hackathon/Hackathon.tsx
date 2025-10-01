@@ -23,10 +23,10 @@ const FitnessHackathonSlider = () => {
     };
 
     return (
-        <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800 p-2">
-            <div className="max-w-md mx-auto space-y-3">
+        <div className="h-screen overflow-y-auto bg-gradient-to-br from-orange-600 via-red-600 to-orange-800">
+            <div className="max-w-md mx-auto">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid grid-cols-2 bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-3 my-4 w-full gap-2 h-14">
+                    <TabsList className="sticky top-0 z-10 grid grid-cols-2 bg-yellow-400 border-t-2 border-l-2 border-r-4 border-b-4 border-black rounded-2xl p-3 mt-2 mb-4 w-full gap-2 h-14">
                         <TabsTrigger
                             value="market"
                             className={`
@@ -50,10 +50,10 @@ const FitnessHackathonSlider = () => {
                             <span className="truncate">My Hackathon</span>
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="market" className="pt-3">
+                    <TabsContent value="market" className="px-2 pb-3">
                         <AllHackathon onJoinHackathon={handleJoinHackathon} />
                     </TabsContent>
-                    <TabsContent value="my-nfts" className="pt-3">
+                    <TabsContent value="my-nfts" className="px-2 pb-3">
                         <MyHackathon myNFTs={myNFTs} />
                     </TabsContent>
                 </Tabs>

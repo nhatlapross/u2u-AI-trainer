@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from "react"
-import { Dumbbell, Flame, PersonStanding, PackageOpen, DollarSign } from 'lucide-react'
+import { Dumbbell, Flame, PersonStanding, PackageOpen, DollarSign, Star } from 'lucide-react'
 import { useAccount, useBalance, useReadContract } from 'wagmi'
 import { abi } from '@/abi/abi'
 
@@ -174,8 +174,8 @@ export default function ProfilePage() {
               <div className="flex items-center space-x-2">
                 <DollarSign className="w-6 h-6 text-black" />
                 <div>
-                  <h3 className="text-lg font-bold text-black">ETH Balance</h3>
-                  <p className="text-black/70 text-xs">Base Sepolia Testnet</p>
+                  <h3 className="text-lg font-bold text-black">U2U Balance</h3>
+                  <p className="text-black/70 text-xs">U2U Testnet</p>
                 </div>
               </div>
               <div className="text-xl font-bold text-black">0.00</div>
@@ -204,8 +204,8 @@ export default function ProfilePage() {
               <div className="flex items-center space-x-2">
                 <DollarSign className="w-6 h-6 text-black" />
                 <div>
-                  <h3 className="text-lg font-bold text-black">ETH Balance</h3>
-                  <p className="text-black/70 text-xs">Base Sepolia Testnet</p>
+                  <h3 className="text-lg font-bold text-black">U2U Balance</h3>
+                  <p className="text-black/70 text-xs">U2U Testnet</p>
                 </div>
               </div>
               <div className="text-xl font-bold text-black">{myBalance}</div>
@@ -245,8 +245,8 @@ export default function ProfilePage() {
             <div className="flex items-center space-x-2">
               <DollarSign className="w-6 h-6 text-black" />
               <div>
-                <h3 className="text-lg font-bold text-black">ETH Balance</h3>
-                <p className="text-black/70 text-xs">Base Sepolia Testnet</p>
+                <h3 className="text-lg font-bold text-black">U2U Balance</h3>
+                <p className="text-black/70 text-xs">U2U Testnet</p>
               </div>
             </div>
             <div className="text-xl font-bold text-black">{myBalance}</div>
@@ -291,6 +291,14 @@ export default function ProfilePage() {
             </div>
             <div className="w-full bg-black/20 rounded-full h-2">
               <div className="bg-orange-600 h-2 rounded-full" style={{width: '82%'}}></div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Star className="text-yellow-600 w-4 h-4 fill-yellow-600" />
+                <span className="text-black font-medium text-sm">NFT Points</span>
+              </div>
+              <span className="font-bold text-black text-sm">{userStats.points.toString()} pts</span>
             </div>
 
             <div className="flex items-center justify-between">

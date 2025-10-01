@@ -33,13 +33,6 @@ export default function NFTSlider({ onNFTUse, nftDetails, mockNFT }: NFTSliderPr
   const [selectedNFT, setSelectedNFT] = useState<any>(null)
   
   const { address } = useAccount()
-  const { 
-    data: hash, 
-    writeContract, 
-    isSuccess: isRedeemSuccess, 
-    error: redeemError 
-  } = useWriteContract();
-  const [isMinting, setIsMinting] = useState(false);
 
   // Fetch NFTs using useReadContract
   const { 
@@ -111,34 +104,6 @@ export default function NFTSlider({ onNFTUse, nftDetails, mockNFT }: NFTSliderPr
     setSelectedNFT(null)
   }
 
-  const redeemPoint = async () => {
-    setIsMinting(true);
-    try {
-      await writeContract({
-        abi: abi,
-        address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
-        functionName: 'redeemPoints',
-        args: [selectedNFT.tokenId, selectedNFT.points],
-      });
-    } catch (error) {
-      setIsMinting(false)
-      alert("Unable to redeem points");
-    }
-  }
-
-  useEffect(() => {
-    if (isRedeemSuccess) {
-      // Reload NFT details
-      refetchNFTDetails()
-
-      // Reset minting state
-      setIsMinting(false)
-      
-      // Close modal
-      handleCloseModal()
-    }
-  }, [isRedeemSuccess])
-
   const handleUseNFT = () => {
     if (!selectedNFT) return
 
@@ -163,12 +128,6 @@ export default function NFTSlider({ onNFTUse, nftDetails, mockNFT }: NFTSliderPr
     onNFTUse && onNFTUse(usedNFT || null)
     handleCloseModal()
   }
-
-  useEffect(()=>{
-    if(hash != null){
-      alert("redeem success!");
-    }
-  },[hash])
 
   // Render loading or error states
   if (isLoading) return <div>Loading NFTs...</div>
@@ -290,33 +249,14 @@ export default function NFTSlider({ onNFTUse, nftDetails, mockNFT }: NFTSliderPr
                 </div>
               </div>
 
-              {isMinting ? (
-                <div className="text-center mb-4">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-black border-t-transparent mb-4"></div>
-                  <p className="text-black/80 text-lg font-semibold">Processing Transaction...</p>
-                  <p className="text-black/60 text-sm">Please wait while we redeem your points</p>
-                </div>
-              ) : (
-                <div className="flex gap-3 justify-center">
-                  <button
-                    onClick={handleUseNFT}
-                    className="px-6 py-3 bg-blue-500 text-white font-bold rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black hover:bg-blue-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2 transition-all duration-200"
-                  >
-                    {selectedNFT.isUsing ? "Unuse NFT" : "Use NFT"}
-                  </button>
-                  <button
-                    onClick={() => redeemPoint()}
-                    disabled={selectedNFT.isMock}
-                    className={`px-6 py-3 font-bold rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black transition-all duration-200 ${
-                      selectedNFT.isMock 
-                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                        : 'bg-green-500 text-white hover:bg-green-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2'
-                    }`}
-                  >
-                    Redeem
-                  </button>
-                </div>
-              )}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleUseNFT}
+                  className="px-6 py-3 bg-blue-500 text-white font-bold rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black hover:bg-blue-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2 transition-all duration-200"
+                >
+                  {selectedNFT.isUsing ? "Unuse NFT" : "Use NFT"}
+                </button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
