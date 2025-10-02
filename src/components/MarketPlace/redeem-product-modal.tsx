@@ -6,6 +6,7 @@ import { Product } from './product-card'
 import { useState, useEffect } from 'react'
 import { useAccount, useReadContract, useWriteContract } from 'wagmi'
 import { abi } from '@/abi/abi'
+import toast from 'react-hot-toast'
 
 interface RedeemProductModalProps {
   isOpen: boolean;
@@ -59,25 +60,36 @@ export default function RedeemProductModal({
   useEffect(() => {
     if (hash != null) {
       setIsRedeeming(false)
-      alert('Points redeemed successfully!')
+      toast.success(`Successfully redeemed ${product?.pointsRequired} points for ${product?.name}!`)
       onRedeem(selectedNFT.tokenId)
       onClose()
     }
-  }, [hash])
+  }, [hash, product, selectedNFT])
 
-  const handleConfirmRedeem = async () => {
+  const handleConfirmRedeem = () => {
     if (selectedNFT && product) {
       setIsRedeeming(true)
+      const toastId = toast.loading('Processing redemption...')
       try {
-        await writeContract({
+        writeContract({
           abi,
           address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
           functionName: 'redeemPoints',
           args: [BigInt(selectedNFT.tokenId), BigInt(product.pointsRequired)],
         })
-      } catch (error) {
+        toast.dismiss(toastId)
+      } catch (error: any) {
         console.error('Redeem points failed:', error)
-        alert('Redeem failed! Please try again.')
+        toast.dismiss(toastId)
+
+        // Handle specific error cases
+        if (error?.message?.includes('User rejected')) {
+          toast.error('Transaction was cancelled by user')
+        } else if (error?.message?.includes('insufficient funds')) {
+          toast.error('Insufficient funds for transaction')
+        } else {
+          toast.error('Redeem failed! Please try again.')
+        }
         setIsRedeeming(false)
       }
     }

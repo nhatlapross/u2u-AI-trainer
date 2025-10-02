@@ -7,6 +7,7 @@ import SellNFTModal from '@/components/MarketPlace/sell-nft-modal'
 import BuyNFTModal from '@/components/MarketPlace/buy-nft-modal'
 import ProductCard, { Product } from '@/components/MarketPlace/product-card'
 import RedeemProductModal from '@/components/MarketPlace/redeem-product-modal'
+import toast from 'react-hot-toast'
 
 // Move mock data outside component to prevent recreation
 const mockNFTs = [
@@ -192,7 +193,6 @@ export default function NFTMarketplace() {
             setIsRedeemModalOpen(false)
             // In real implementation, this would call smart contract to redeem points from NFT
             console.log('Redeeming with NFT:', nftTokenId)
-            alert(`Successfully redeemed ${selectedProduct.name}!`)
         }
     }, [selectedProduct, products])
 
