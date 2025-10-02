@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import Image from 'next/image'
 import { Product } from './product-card'
 import { useState, useEffect } from 'react'
-import { useAccount, useReadContract } from 'wagmi'
+import { useAccount, useReadContract, useWriteContract } from 'wagmi'
 import { abi } from '@/abi/abi'
 
 interface RedeemProductModalProps {
@@ -23,6 +23,7 @@ export default function RedeemProductModal({
   const { address } = useAccount()
   const [selectedNFT, setSelectedNFT] = useState<any>(null)
   const [nfts, setNFTs] = useState<any[]>([])
+  const [isRedeeming, setIsRedeeming] = useState(false)
 
   // Fetch NFTs using useReadContract
   const {
@@ -38,6 +39,9 @@ export default function RedeemProductModal({
     }
   })
 
+  // Write contract hook for redeeming points
+  const { data: hash, writeContract } = useWriteContract()
+
   useEffect(() => {
     if (contractNftDetails && Array.isArray(contractNftDetails)) {
       const transformedNFTs = contractNftDetails.map((nft: any) => ({
@@ -51,10 +55,31 @@ export default function RedeemProductModal({
     }
   }, [contractNftDetails])
 
-  const handleConfirmRedeem = () => {
-    if (selectedNFT && product) {
+  // Handle transaction success
+  useEffect(() => {
+    if (hash != null) {
+      setIsRedeeming(false)
+      alert('Points redeemed successfully!')
       onRedeem(selectedNFT.tokenId)
       onClose()
+    }
+  }, [hash])
+
+  const handleConfirmRedeem = async () => {
+    if (selectedNFT && product) {
+      setIsRedeeming(true)
+      try {
+        await writeContract({
+          abi,
+          address: process.env.NEXT_PUBLIC_WEFIT_NFT as `0x${string}`,
+          functionName: 'redeemPoints',
+          args: [BigInt(selectedNFT.tokenId), BigInt(product.pointsRequired)],
+        })
+      } catch (error) {
+        console.error('Redeem points failed:', error)
+        alert('Redeem failed! Please try again.')
+        setIsRedeeming(false)
+      }
     }
   }
 
@@ -174,14 +199,14 @@ export default function RedeemProductModal({
             </button>
             <button
               onClick={handleConfirmRedeem}
-              disabled={!canRedeem}
+              disabled={!canRedeem || isRedeeming}
               className={`flex-1 px-6 py-3 font-bold rounded-xl border-t-2 border-l-2 border-r-4 border-b-4 border-black transition-all duration-200 ${
-                canRedeem
+                canRedeem && !isRedeeming
                   ? 'bg-green-500 text-white hover:bg-green-600 active:transform active:translate-x-1 active:translate-y-1 active:border-r-2 active:border-b-2'
                   : 'bg-gray-400 text-gray-600 cursor-not-allowed'
               }`}
             >
-              Confirm Redeem
+              {isRedeeming ? 'Redeeming...' : 'Confirm Redeem'}
             </button>
           </div>
         </div>
