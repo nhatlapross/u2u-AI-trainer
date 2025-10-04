@@ -14,10 +14,10 @@ const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
-// Define U2U Network Testnet
-export const u2uTestnet = defineChain({
-  id: 2484,
-  name: 'U2U Network Testnet',
+// Define U2U Network Mainnet
+export const u2uMainnet = defineChain({
+  id: 39,
+  name: 'U2U Solaris Mainnet',
   nativeCurrency: {
     name: 'U2U',
     symbol: 'U2U',
@@ -25,20 +25,20 @@ export const u2uTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc-nebulas-testnet.uniultra.xyz'],
+      http: ['https://rpc-mainnet.uniultra.xyz'],
     },
   },
   blockExplorers: {
     default: {
       name: 'U2U Scan',
-      url: 'https://testnet.u2uscan.xyz',
+      url: 'https://u2uscan.xyz',
     },
   },
-  testnet: true,
+  testnet: false,
 })
 
 // Create wagmiConfig
-const chains = [u2uTestnet] as const
+const chains = [u2uMainnet] as const
 export const config = defaultWagmiConfig({
   chains,
   projectId,
