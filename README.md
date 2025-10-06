@@ -2,7 +2,7 @@
 
 Your personal AI fitness trainer that creates customized workout plans and provides real-time feedback to help you achieve your fitness goals.
 
-![Hero Image](https://boar-fit.vercel.app/hero.png)
+![Hero Image](https://the-boar.vercel.app/hero.png)
 
 ## 🌟 Features
 
@@ -131,7 +131,7 @@ This project is licensed under the MIT License.
 
 ## 🔗 Links
 
-- **Live App**: [boar-fit.vercel.app](https://boar-fit.vercel.app)
+- **Live App**: [the-boar.vercel.app](https://the-boar.vercel.app)
 - **U2U Network**: [u2u.xyz](https://u2u.xyz)
 - **Documentation**: [docs](https://github.com/yourusername/u2u-AI-trainer/wiki)
 
