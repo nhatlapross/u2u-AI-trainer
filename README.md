@@ -121,12 +121,6 @@ npm start
 npm run lint
 ```
 
-## 📱 Deployment
-
-The app is optimized for deployment on Vercel:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/u2u-AI-trainer)
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
