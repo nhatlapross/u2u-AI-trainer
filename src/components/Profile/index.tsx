@@ -175,7 +175,7 @@ export default function ProfilePage() {
                 <DollarSign className="w-6 h-6 text-black" />
                 <div>
                   <h3 className="text-lg font-bold text-black">U2U Balance</h3>
-                  <p className="text-black/70 text-xs">U2U Testnet</p>
+                  <p className="text-black/70 text-xs">U2U</p>
                 </div>
               </div>
               <div className="text-xl font-bold text-black">0.00</div>
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                 <DollarSign className="w-6 h-6 text-black" />
                 <div>
                   <h3 className="text-lg font-bold text-black">U2U Balance</h3>
-                  <p className="text-black/70 text-xs">U2U Testnet</p>
+                  <p className="text-black/70 text-xs">U2U</p>
                 </div>
               </div>
               <div className="text-xl font-bold text-black">{myBalance}</div>
@@ -246,7 +246,7 @@ export default function ProfilePage() {
               <DollarSign className="w-6 h-6 text-black" />
               <div>
                 <h3 className="text-lg font-bold text-black">U2U Balance</h3>
-                <p className="text-black/70 text-xs">U2U Testnet</p>
+                <p className="text-black/70 text-xs">U2U</p>
               </div>
             </div>
             <div className="text-xl font-bold text-black">{myBalance}</div>
